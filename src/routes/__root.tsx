@@ -32,7 +32,12 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+type ErrorComponentProps = {
+  error: Error;
+  reset: () => void;
+};
+
+function ErrorComponent({ error, reset }: Readonly<ErrorComponentProps>) {
   console.error(error);
   const router = useRouter();
 
@@ -103,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: React.ReactNode }) {
+function RootShell({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>

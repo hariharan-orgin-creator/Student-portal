@@ -37,20 +37,18 @@ const accentStyles = {
   },
 };
 
-function SummaryStat({
-  label,
-  value,
-  highlight,
-}: {
+type SummaryStatProps = {
   label: string;
   value: string;
   highlight?: boolean;
-}) {
+};
+
+function SummaryStat({ label, value, highlight }: Readonly<SummaryStatProps>) {
   return (
     <div
       className={cn(
         "rounded-xl bg-card/80 px-3 py-2.5",
-        highlight && "ring-2 ring-[var(--duo-green)]/30",
+        highlight && "ring-2 ring-(--duo-green)/30",
       )}
     >
       <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -59,11 +57,11 @@ function SummaryStat({
   );
 }
 
-function SubjectPerformanceCard({
-  subject,
-}: {
+type SubjectPerformanceCardProps = {
   subject: (typeof EXAM_RESULTS_REPORT.subjects)[0];
-}) {
+};
+
+function SubjectPerformanceCard({ subject }: Readonly<SubjectPerformanceCardProps>) {
   const style = accentStyles[subject.accent];
   const delta = subject.score - subject.previousScore;
 
@@ -80,7 +78,7 @@ function SubjectPerformanceCard({
           </div>
         </div>
         {delta > 0 && (
-          <span className="flex items-center gap-0.5 rounded-full bg-[oklch(0.95_0.08_145)] px-2 py-1 text-[10px] font-bold text-[var(--duo-green-dark)]">
+          <span className="flex items-center gap-0.5 rounded-full bg-[oklch(0.95_0.08_145)] px-2 py-1 text-[10px] font-bold text-duo-green-dark">
             <ArrowUpRight className="size-3" />+{delta}%
           </span>
         )}
@@ -92,26 +90,26 @@ function SubjectPerformanceCard({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div>
-          <p className="mb-1.5 text-[10px] font-bold uppercase text-[var(--duo-green-dark)]">
+          <p className="mb-1.5 text-[10px] font-bold uppercase text-duo-green-dark">
             Strengths
           </p>
           <ul className="space-y-1">
             {subject.strengths.map((s) => (
               <li key={s} className="flex items-center gap-1.5 text-xs font-bold">
-                <span className="text-[var(--duo-green)]">✓</span>
+                <span className="text-duo-green">✓</span>
                 {s}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <p className="mb-1.5 text-[10px] font-bold uppercase text-[var(--duo-orange)]">
+          <p className="mb-1.5 text-[10px] font-bold uppercase text-duo-orange">
             Needs Practice
           </p>
           <ul className="space-y-1">
             {subject.needsPractice.map((s) => (
               <li key={s} className="flex items-center gap-1.5 text-xs font-bold">
-                <span className="text-[var(--duo-orange)]">⚠</span>
+                <span className="text-duo-orange">⚠</span>
                 {s}
               </li>
             ))}
@@ -120,18 +118,18 @@ function SubjectPerformanceCard({
       </div>
 
       <div className="mt-3 flex items-start gap-2 rounded-lg bg-card/90 p-2.5">
-        <Lightbulb className="mt-0.5 size-4 shrink-0 text-[var(--duo-yellow)]" />
+        <Lightbulb className="mt-0.5 size-4 shrink-0 text-duo-yellow" />
         <p className="text-xs leading-relaxed text-muted-foreground">{subject.mentorNote}</p>
       </div>
 
       <p className="mt-2 text-[10px] font-bold text-muted-foreground">
         Compared to last exam:{" "}
         {delta > 0 ? (
-          <span className="text-[var(--duo-green-dark)]">↑ Improved by {delta}%</span>
+          <span className="text-duo-green-dark">↑ Improved by {delta}%</span>
         ) : delta === 0 ? (
           <span>No change</span>
         ) : (
-          <span className="text-[var(--duo-red)]">↓ Decreased by {Math.abs(delta)}%</span>
+          <span className="text-duo-red">↓ Decreased by {Math.abs(delta)}%</span>
         )}
       </p>
     </DuoCard>
@@ -145,7 +143,7 @@ export function ExamResultsPage() {
     <div className="mx-auto max-w-3xl space-y-6 pb-8">
       {/* TOP — Emotional + academic summary */}
       <section>
-        <DuoCard className="overflow-hidden bg-gradient-to-br from-[oklch(0.97_0.06_145)] via-card to-[oklch(0.98_0.04_90)] p-5">
+        <DuoCard className="overflow-hidden bg-linear-to-br from-[oklch(0.97_0.06_145)] via-card to-[oklch(0.98_0.04_90)] p-5">
           <div className="flex items-start gap-3">
             <span className="text-4xl">{r.headlineEmoji}</span>
             <div className="min-w-0 flex-1">
@@ -167,12 +165,12 @@ export function ExamResultsPage() {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-card/60 px-3 py-2">
-            <span className="flex items-center gap-1 text-xs font-bold text-[var(--duo-green-dark)]">
+            <span className="flex items-center gap-1 text-xs font-bold text-duo-green-dark">
               <TrendingUp className="size-4" />
               {r.consistencyLabel}
             </span>
             <span className="flex items-center gap-1 text-xs font-bold text-muted-foreground">
-              <Flame className="size-4 text-[var(--duo-orange)]" />
+              <Flame className="size-4 text-duo-orange" />
               {r.studyStreakWeeks}-week study streak
             </span>
           </div>
@@ -204,7 +202,7 @@ export function ExamResultsPage() {
           <ol className="space-y-2">
             {r.nextSteps.map((step, i) => (
               <li key={step} className="flex gap-2 text-sm">
-                <span className="font-numeric flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--duo-green)] text-xs font-bold text-white">
+                <span className="font-numeric flex size-6 shrink-0 items-center justify-center rounded-full bg-duo-green text-xs font-bold text-white">
                   {i + 1}
                 </span>
                 <span className="font-bold pt-0.5">{step}</span>
@@ -213,15 +211,15 @@ export function ExamResultsPage() {
           </ol>
         </DuoCard>
 
-        <DuoCard className="border-l-4 border-l-[var(--duo-blue)] bg-[oklch(0.98_0.04_240)] p-4">
-          <h3 className="mb-2 flex items-center gap-2 font-display text-sm font-bold text-[var(--duo-blue)]">
+        <DuoCard className="border-l-4 border-l-duo-blue bg-[oklch(0.98_0.04_240)] p-4">
+          <h3 className="mb-2 flex items-center gap-2 font-display text-sm font-bold text-duo-blue">
             <ClipboardList className="size-4" />
             Recovery plan — {r.recoveryPlan.subject}
           </h3>
           <ul className="space-y-1.5">
             {r.recoveryPlan.items.map((item) => (
               <li key={item} className="flex items-center gap-2 text-xs font-bold">
-                <span className="size-1.5 rounded-full bg-[var(--duo-blue)]" />
+                <span className="size-1.5 rounded-full bg-duo-blue" />
                 {item}
               </li>
             ))}
@@ -229,7 +227,7 @@ export function ExamResultsPage() {
         </DuoCard>
 
         <DuoCard className="p-4">
-          <h3 className="mb-2 flex items-center gap-2 font-display text-sm font-bold text-[var(--duo-purple)]">
+          <h3 className="mb-2 flex items-center gap-2 font-display text-sm font-bold text-duo-purple">
             <MessageSquareQuote className="size-4" />
             Teacher notes
           </h3>
@@ -250,10 +248,10 @@ export function ExamResultsPage() {
           Your growth journey
         </h2>
 
-        <DuoCard className="bg-gradient-to-r from-[oklch(0.96_0.08_145)] to-card p-4">
+        <DuoCard className="bg-linear-to-r from-[oklch(0.96_0.08_145)] to-card p-4">
           <p className="text-sm font-bold leading-snug">
             You improved faster than{" "}
-            <span className="font-numeric text-lg text-[var(--duo-green-dark)]">
+            <span className="font-numeric text-lg text-duo-green-dark">
               {r.growthVsPeers}%
             </span>{" "}
             of students this term.
@@ -265,7 +263,7 @@ export function ExamResultsPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <DuoCard className="p-4">
-            <h3 className="mb-2 font-display text-sm font-bold text-[var(--duo-green-dark)]">
+            <h3 className="mb-2 font-display text-sm font-bold text-duo-green-dark">
               Your strengths
             </h3>
             <ul className="space-y-1.5">
@@ -277,8 +275,8 @@ export function ExamResultsPage() {
             </ul>
           </DuoCard>
 
-          <DuoCard className="border-l-4 border-l-[var(--duo-orange)] bg-[oklch(0.99_0.04_50)] p-4">
-            <h3 className="mb-2 font-display text-sm font-bold text-[var(--duo-orange)]">
+          <DuoCard className="border-l-4 border-l-duo-orange bg-[oklch(0.99_0.04_50)] p-4">
+            <h3 className="mb-2 font-display text-sm font-bold text-duo-orange">
               Needs practice
             </h3>
             <ul className="space-y-1.5">
@@ -296,7 +294,7 @@ export function ExamResultsPage() {
           <p className="mt-1 text-xs text-muted-foreground">
             Current exam readiness for final boards
           </p>
-          <p className="font-numeric mt-2 text-4xl font-extrabold text-[var(--duo-purple)]">
+          <p className="font-numeric mt-2 text-4xl font-extrabold text-duo-purple">
             {r.finalBoardReadiness}%
           </p>
           <DuoProgress value={r.finalBoardReadiness} color="purple" label="Board readiness" />
@@ -322,9 +320,9 @@ export function ExamResultsPage() {
                       className={cn(
                         "w-full rounded-t-md transition-all",
                         delta < 0
-                          ? "bg-[var(--duo-red)]"
+                          ? "bg-duo-red"
                           : delta > 0
-                            ? "bg-[var(--duo-green)]"
+                            ? "bg-duo-green"
                             : "bg-muted-foreground/40",
                       )}
                       style={{ height: `${absHeight}%` }}
@@ -334,9 +332,9 @@ export function ExamResultsPage() {
                     className={cn(
                       "flex items-center gap-0.5 font-numeric text-[10px] font-bold",
                       delta < 0
-                        ? "text-[var(--duo-red)]"
+                        ? "text-duo-red"
                         : delta > 0
-                          ? "text-[var(--duo-green-dark)]"
+                          ? "text-duo-green-dark"
                           : "text-muted-foreground",
                     )}
                   >

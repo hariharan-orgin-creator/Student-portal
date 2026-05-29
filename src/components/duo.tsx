@@ -25,7 +25,7 @@ export function DuoButton({
   className,
   children,
   ...props
-}: DuoButtonProps) {
+}: Readonly<DuoButtonProps>) {
   const sizes = {
     sm: "px-3 py-1.5 text-xs",
     md: "px-5 py-2.5 text-sm",
@@ -46,27 +46,31 @@ export function DuoButton({
   );
 }
 
+type DuoCardProps = {
+  children: ReactNode;
+  className?: string;
+  accent?: Variant;
+};
+
 export function DuoCard({
   children,
   className,
   accent: _accent,
-}: {
-  children: ReactNode;
-  className?: string;
-  accent?: Variant;
-}) {
+}: Readonly<DuoCardProps>) {
   return <div className={cn("card-pop p-5", className)}>{children}</div>;
 }
+
+type DuoProgressProps = {
+  value: number;
+  label?: string;
+  color?: Variant;
+};
 
 export function DuoProgress({
   value,
   label,
   color = "green",
-}: {
-  value: number;
-  label?: string;
-  color?: Variant;
-}) {
+}: Readonly<DuoProgressProps>) {
   const colorMap: Record<string, string> = {
     green: "linear-gradient(180deg, oklch(0.82 0.19 145), oklch(0.65 0.2 145))",
     blue: "linear-gradient(180deg, oklch(0.78 0.16 240), oklch(0.6 0.18 240))",
@@ -95,7 +99,12 @@ export function DuoProgress({
   );
 }
 
-export function Chip({ children, color = "green" }: { children: ReactNode; color?: Variant }) {
+type ChipProps = {
+  children: ReactNode;
+  color?: Variant;
+};
+
+export function Chip({ children, color = "green" }: Readonly<ChipProps>) {
   const map: Record<string, string> = {
     green: "bg-[oklch(0.93_0.08_145)] text-[oklch(0.4_0.15_145)]",
     blue: "bg-[oklch(0.93_0.06_240)] text-[oklch(0.4_0.15_240)]",

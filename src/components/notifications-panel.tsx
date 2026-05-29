@@ -11,18 +11,16 @@ import {
 import { cn } from "@/lib/utils";
 
 function UnreadDot() {
-  return <span className="mt-1.5 size-2 shrink-0 rounded-full bg-[var(--duo-blue)]" aria-hidden />;
+  return <span className="mt-1.5 size-2 shrink-0 rounded-full bg-duo-blue" aria-hidden />;
 }
 
-function NotificationRow({
-  item,
-  onRead,
-  variant,
-}: {
+type NotificationRowProps = {
   item: StudentNotification | StudentAnnouncement;
   onRead: (id: string) => void;
   variant: "notification" | "announcement";
-}) {
+};
+
+function NotificationRow({ item, onRead, variant }: Readonly<NotificationRowProps>) {
   const from = "from" in item ? item.from : undefined;
 
   return (
@@ -48,13 +46,13 @@ function NotificationRow({
         </div>
         <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.body}</p>
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] font-bold text-muted-foreground">
-          {from && <span className="text-[var(--duo-purple)]">{from}</span>}
+          {from && <span className="text-duo-purple">{from}</span>}
           {from && <span>·</span>}
           <span>{item.time}</span>
           {variant === "announcement" && "pinned" in item && item.pinned && (
             <>
               <span>·</span>
-              <span className="text-[var(--duo-orange)]">Pinned</span>
+              <span className="text-duo-orange">Pinned</span>
             </>
           )}
         </div>
@@ -105,7 +103,7 @@ export function NotificationsPanel() {
         >
           <Bell className="size-4" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 grid min-w-4 place-items-center rounded-full bg-[var(--duo-red)] px-1 text-[10px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 grid min-w-4 place-items-center rounded-full bg-duo-red px-1 text-[10px] font-bold text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -123,7 +121,7 @@ export function NotificationsPanel() {
               <button
                 type="button"
                 onClick={markAllRead}
-                className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold text-[var(--duo-green-dark)] hover:bg-muted"
+                className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold text-duo-green-dark hover:bg-muted"
               >
                 <CheckCheck className="size-3.5" />
                 Mark all read
@@ -138,7 +136,7 @@ export function NotificationsPanel() {
               <Bell className="size-3.5" />
               Notifications
               {unreadNotifications > 0 && (
-                <span className="font-numeric rounded-full bg-[var(--duo-blue)] px-1.5 py-0.5 text-[9px] text-white">
+                <span className="font-numeric rounded-full bg-duo-blue px-1.5 py-0.5 text-[9px] text-white">
                   {unreadNotifications}
                 </span>
               )}
@@ -147,7 +145,7 @@ export function NotificationsPanel() {
               <Megaphone className="size-3.5" />
               Announcements
               {unreadAnnouncements > 0 && (
-                <span className="font-numeric rounded-full bg-[var(--duo-purple)] px-1.5 py-0.5 text-[9px] text-white">
+                <span className="font-numeric rounded-full bg-duo-purple px-1.5 py-0.5 text-[9px] text-white">
                   {unreadAnnouncements}
                 </span>
               )}

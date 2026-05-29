@@ -38,11 +38,11 @@ function buildLeaderboard(userPoints: number, period: Period): RankedStudent[] {
   return [...entries].sort((a, b) => b.points - a.points).map((e, i) => ({ ...e, rank: i + 1 }));
 }
 
-function TrendIcon({ trend }: { trend: "up" | "down" | "same" }) {
+function TrendIcon({ trend }: Readonly<{ trend: "up" | "down" | "same" }>) {
   if (trend === "up")
-    return <ChevronUp className="size-3.5 text-[var(--duo-green)]" strokeWidth={3} />;
+    return <ChevronUp className="size-3.5 text-duo-green" strokeWidth={3} />;
   if (trend === "down")
-    return <ChevronDown className="size-3.5 text-[var(--duo-red)]" strokeWidth={3} />;
+    return <ChevronDown className="size-3.5 text-duo-red" strokeWidth={3} />;
   return <Minus className="size-3 text-muted-foreground" />;
 }
 
@@ -50,11 +50,11 @@ function PodiumSlot({
   student,
   place,
   height,
-}: {
+}: Readonly<{
   student: RankedStudent;
   place: 1 | 2 | 3;
   height: string;
-}) {
+}>) {
   return (
     <div className="flex flex-1 flex-col items-center min-w-0">
       <div className="mb-1 flex flex-col items-center gap-0.5 text-center">
@@ -64,7 +64,7 @@ function PodiumSlot({
         <p className="max-w-[72px] truncate text-[10px] font-bold leading-tight text-white">
           {student.isCurrentUser ? "You" : student.name.split(" ")[0]}
         </p>
-        <span className="font-numeric rounded-full bg-white px-1.5 py-px text-[9px] font-extrabold text-[var(--duo-orange)]">
+        <span className="font-numeric rounded-full bg-white px-1.5 py-px text-[9px] font-extrabold text-duo-orange">
           {student.points}
         </span>
       </div>
@@ -80,7 +80,11 @@ function PodiumSlot({
   );
 }
 
-export function ClassLeaderboard({ userPoints }: { userPoints: number }) {
+type ClassLeaderboardProps = {
+  userPoints: number;
+};
+
+export function ClassLeaderboard({ userPoints }: Readonly<ClassLeaderboardProps>) {
   const [period, setPeriod] = useState<Period>("weekly");
 
   const ranked = useMemo(() => buildLeaderboard(userPoints, period), [userPoints, period]);
@@ -101,8 +105,8 @@ export function ClassLeaderboard({ userPoints }: { userPoints: number }) {
   ];
 
   return (
-    <section className="overflow-hidden rounded-2xl shadow-[var(--card-shadow)]">
-      <div className="bg-[var(--duo-orange)] px-3 pb-0 pt-2.5">
+    <section className="overflow-hidden rounded-2xl shadow-card">
+      <div className="bg-duo-orange px-3 pb-0 pt-2.5">
         <h2 className="text-center font-display text-sm font-bold text-white">Leaderboard</h2>
 
         <div className="mx-auto mt-2 flex max-w-[200px] rounded-full border border-white/30 bg-white/15 p-0.5">
@@ -112,7 +116,7 @@ export function ClassLeaderboard({ userPoints }: { userPoints: number }) {
             className={cn(
               "flex-1 rounded-full py-1 text-[10px] font-extrabold transition",
               period === "weekly"
-                ? "bg-white text-[var(--duo-orange)]"
+                ? "bg-white text-duo-orange"
                 : "text-white hover:bg-white/10",
             )}
           >
@@ -124,7 +128,7 @@ export function ClassLeaderboard({ userPoints }: { userPoints: number }) {
             className={cn(
               "flex-1 rounded-full py-1 text-[10px] font-extrabold transition",
               period === "allTime"
-                ? "bg-white text-[var(--duo-orange)]"
+                ? "bg-white text-duo-orange"
                 : "text-white hover:bg-white/10",
             )}
           >
@@ -143,7 +147,7 @@ export function ClassLeaderboard({ userPoints }: { userPoints: number }) {
 
       <div className="rounded-t-xl bg-card px-3 pb-2 pt-2">
         {currentUser && !inTop3 && (
-          <p className="mb-1.5 text-center text-[10px] font-bold text-[var(--duo-orange)]">
+          <p className="mb-1.5 text-center text-[10px] font-bold text-duo-orange">
             #{currentUser.rank} · +{ptsToTop3} pts for Top 3
           </p>
         )}
@@ -161,7 +165,7 @@ export function ClassLeaderboard({ userPoints }: { userPoints: number }) {
                 <p
                   className={cn(
                     "truncate text-xs font-bold leading-tight",
-                    student.isCurrentUser ? "text-[var(--duo-orange)]" : "text-foreground",
+                    student.isCurrentUser ? "text-duo-orange" : "text-foreground",
                   )}
                 >
                   {student.name}

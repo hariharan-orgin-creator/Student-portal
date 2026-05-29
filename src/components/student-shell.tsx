@@ -27,19 +27,21 @@ const NAV = [
   { icon: Settings, label: "Settings", to: "/student/settings" as const },
 ];
 
+type StudentShellProps = {
+  children: ReactNode;
+  activeNav: string;
+  points?: number;
+  streak?: number;
+  wide?: boolean;
+};
+
 export function StudentShell({
   children,
   activeNav,
   points = 320,
   streak = 5,
   wide = false,
-}: {
-  children: ReactNode;
-  activeNav: string;
-  points?: number;
-  streak?: number;
-  wide?: boolean;
-}) {
+}: Readonly<StudentShellProps>) {
   const mobileNav = [
     { icon: Home, label: "Home", to: "/student" as const },
     { icon: ClipboardList, label: "Tasks", to: "/student/assignments" as const },
@@ -58,11 +60,11 @@ export function StudentShell({
           </Link>
           <div className="flex items-center gap-2 md:gap-4">
             <div className="flex items-center gap-1.5 rounded-full bg-[oklch(0.95_0.08_90)] px-3 py-1.5">
-              <Star className="size-4 fill-[var(--duo-yellow)] text-[var(--duo-yellow)]" />
+              <Star className="size-4 fill-duo-yellow text-duo-yellow" />
               <span className="font-numeric text-sm font-extrabold">{points}</span>
             </div>
             <div className="flex items-center gap-1.5 rounded-full bg-[oklch(0.95_0.08_25)] px-3 py-1.5">
-              <Flame className="size-4 fill-[var(--duo-orange)] text-[var(--duo-orange)]" />
+              <Flame className="size-4 fill-duo-orange text-duo-orange" />
               <span className="font-numeric text-sm font-extrabold">{streak}</span>
               <span className="hidden text-xs font-bold text-muted-foreground sm:inline">days</span>
             </div>
@@ -75,13 +77,13 @@ export function StudentShell({
         className={`mx-auto grid w-full grid-cols-1 gap-4 px-4 py-4 md:grid-cols-[200px_1fr] md:px-6 md:py-5 ${wide ? "max-w-[90rem]" : "max-w-7xl"}`}
       >
         <aside className="hidden md:block">
-          <DuoCard className="sticky top-[4.5rem] flex flex-col p-3">
+          <DuoCard className="sticky top-18 flex flex-col p-3">
             <div className="mb-3 flex flex-col items-center text-center">
               <div className="relative">
-                <div className="grid size-14 place-items-center rounded-full border-[3px] border-[var(--duo-green)] bg-[oklch(0.95_0.08_145)] text-2xl">
+                <div className="grid size-14 place-items-center rounded-full border-[3px] border-duo-green bg-[oklch(0.95_0.08_145)] text-2xl">
                   🦕
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 grid size-5 place-items-center rounded-full bg-[var(--duo-purple)] text-[9px] font-bold text-white">
+                <div className="absolute -bottom-0.5 -right-0.5 grid size-5 place-items-center rounded-full bg-duo-purple text-[9px] font-bold text-white">
                   L4
                 </div>
               </div>
@@ -96,7 +98,7 @@ export function StudentShell({
                     to={n.to}
                     className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-bold transition ${
                       isActive
-                        ? "bg-[oklch(0.95_0.08_145)] text-[var(--duo-green-dark)]"
+                        ? "bg-[oklch(0.95_0.08_145)] text-duo-green-dark"
                         : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
@@ -132,7 +134,7 @@ export function StudentShell({
               key={n.label}
               to={n.to}
               className={`flex flex-col items-center gap-0.5 py-2.5 text-xs font-bold ${
-                isActive ? "text-[var(--duo-green-dark)]" : "text-muted-foreground"
+                isActive ? "text-duo-green-dark" : "text-muted-foreground"
               }`}
             >
               <n.icon className="size-5" />

@@ -23,6 +23,19 @@ interface UploadQuestDialogProps {
 }
 
 const ACCEPTED = "image/jpeg,image/png,application/pdf,video/mp4";
+
+const CONFETTI_PIECES = Array.from({ length: 24 }, (_, n) => ({
+  id: `confetti-${n}`,
+  left: `${10 + ((n * 3.5) % 80)}%`,
+  animationDelay: `${n * 40}ms`,
+  background: [
+    "var(--duo-green)",
+    "var(--duo-yellow)",
+    "var(--duo-blue)",
+    "var(--duo-orange)",
+    "var(--duo-purple)",
+  ][n % 5],
+}));
 const MAX_BYTES = 50 * 1024 * 1024;
 
 function formatBytes(bytes: number) {
@@ -36,15 +49,13 @@ function fileIcon(type: string) {
   return FileText;
 }
 
-function SuccessOverlay({
-  points,
-  taskTitle,
-  onDone,
-}: {
+type SuccessOverlayProps = {
   points: number;
   taskTitle: string;
   onDone: () => void;
-}) {
+};
+
+function SuccessOverlay({ points, taskTitle, onDone }: Readonly<SuccessOverlayProps>) {
   useEffect(() => {
     const t = setTimeout(onDone, 2800);
     return () => clearTimeout(t);
@@ -53,36 +64,30 @@ function SuccessOverlay({
   return (
     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-3xl bg-[oklch(0.98_0.04_145)]">
       <div className="confetti-burst pointer-events-none absolute inset-0 overflow-hidden">
-        {Array.from({ length: 24 }).map((_, i) => (
+        {CONFETTI_PIECES.map((piece) => (
           <span
-            key={i}
+            key={piece.id}
             className="confetti-piece"
             style={{
-              left: `${10 + ((i * 3.5) % 80)}%`,
-              animationDelay: `${i * 40}ms`,
-              background: [
-                "var(--duo-green)",
-                "var(--duo-yellow)",
-                "var(--duo-blue)",
-                "var(--duo-orange)",
-                "var(--duo-purple)",
-              ][i % 5],
+              left: piece.left,
+              animationDelay: piece.animationDelay,
+              background: piece.background,
             }}
           />
         ))}
       </div>
       <div className="animate-success-pop relative z-10 flex flex-col items-center gap-3 px-6 text-center">
-        <div className="grid size-24 place-items-center rounded-full border-4 border-[var(--duo-green)] bg-white shadow-[0_6px_0_0_var(--duo-green-dark)]">
-          <Check className="size-12 stroke-[4] text-[var(--duo-green)]" />
+        <div className="grid size-24 place-items-center rounded-full border-4 border-duo-green bg-white shadow-[0_6px_0_0_var(--duo-green-dark)]">
+          <Check className="size-12 stroke-4 text-duo-green" />
         </div>
         <div className="text-6xl animate-pop-in">🦕</div>
-        <h3 className="font-display text-2xl font-bold text-[var(--duo-green-dark)]">
+        <h3 className="font-display text-2xl font-bold text-duo-green-dark">
           Quest Complete!
         </h3>
         <p className="max-w-xs text-sm font-bold text-muted-foreground">
           You submitted <span className="text-foreground">{taskTitle}</span>
         </p>
-        <div className="animate-success-pop mt-1 rounded-full bg-[var(--duo-yellow)] px-5 py-2 font-numeric text-lg font-bold text-[oklch(0.3_0.08_80)] shadow-[0_4px_0_0_oklch(0.7_0.17_85)]">
+        <div className="animate-success-pop mt-1 rounded-full bg-duo-yellow px-5 py-2 font-numeric text-lg font-bold text-[oklch(0.3_0.08_80)] shadow-[0_4px_0_0_oklch(0.7_0.17_85)]">
           +{points} pts
         </div>
       </div>
@@ -97,7 +102,7 @@ export function UploadQuestDialog({
   taskIcon,
   points,
   onSubmitSuccess,
-}: UploadQuestDialogProps) {
+}: Readonly<UploadQuestDialogProps>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<UploadItem[]>([]);
   const [dragOver, setDragOver] = useState(false);
@@ -192,7 +197,7 @@ export function UploadQuestDialog({
         <div className="border-b-2 border-border px-6 pb-4 pt-6">
           <div className="flex items-start gap-3">
             <div className="grid size-11 shrink-0 place-items-center rounded-full bg-[oklch(0.94_0.06_240)]">
-              <CloudUpload className="size-5 text-[var(--duo-blue)]" />
+              <CloudUpload className="size-5 text-duo-blue" />
             </div>
             <div className="flex-1 pr-6">
               <h2 className="font-display text-lg font-bold">Upload files</h2>
@@ -224,8 +229,8 @@ export function UploadQuestDialog({
             className={cn(
               "cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition",
               dragOver
-                ? "border-[var(--duo-green)] bg-[oklch(0.96_0.06_145)]"
-                : "border-border bg-muted/30 hover:border-[var(--duo-green)]/50 hover:bg-muted/50",
+                ? "border-duo-green bg-[oklch(0.96_0.06_145)]"
+                : "border-border bg-muted/30 hover:border-(--duo-green)/50 hover:bg-muted/50",
             )}
           >
             <input
@@ -281,7 +286,7 @@ export function UploadQuestDialog({
                         <Icon
                           className={cn(
                             "size-5",
-                            done ? "text-[var(--duo-green-dark)]" : "text-[var(--duo-red)]",
+                            done ? "text-duo-green-dark" : "text-duo-red",
                           )}
                         />
                       </div>
@@ -293,11 +298,11 @@ export function UploadQuestDialog({
                           </span>
                           <span>•</span>
                           {done ? (
-                            <span className="flex items-center gap-1 font-bold text-[var(--duo-green-dark)]">
+                            <span className="flex items-center gap-1 font-bold text-duo-green-dark">
                               <Check className="size-3" /> Completed
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 font-bold text-[var(--duo-blue)]">
+                            <span className="flex items-center gap-1 font-bold text-duo-blue">
                               <Loader2 className="size-3 animate-spin" /> Uploading…
                             </span>
                           )}

@@ -69,14 +69,41 @@ const behaviorColor: Record<string, "green" | "yellow" | "red"> = {
   low: "red",
 };
 
+const SCHEDULE_ICONS: Record<string, string> = {
+  Science: "🧪",
+  Mathematics: "🔢",
+  English: "📖",
+  "Lunch Break": "🍽️",
+  "Art & Craft": "🎨",
+};
+
+type MobileNavItem = {
+  icon: typeof Home;
+  label: string;
+  id: string;
+  active?: boolean;
+  center?: boolean;
+};
+
+const MOBILE_NAV: MobileNavItem[] = [
+  { icon: Home, label: "Home", active: true, id: "home" },
+  { icon: BookOpen, label: "Classes", id: "classes" },
+  { icon: Plus, label: "", id: "create", center: true },
+  { icon: MessageCircle, label: "Chat", id: "chat" },
+  { icon: Settings, label: "Me", id: "me" },
+];
+
+type AnnouncementPost = { id: string; text: string };
+type ChatMessage = { id: string; from: string; text: string };
+
 function TeacherDashboard() {
   const [activeClass, setActiveClass] = useState(CLASSES[0].id);
   const [attendance, setAttendance] = useState<Record<string, boolean>>({});
   const [announcementOpen, setAnnouncementOpen] = useState(false);
   const [announcementText, setAnnouncementText] = useState("");
-  const [posts, setPosts] = useState<string[]>([]);
+  const [posts, setPosts] = useState<AnnouncementPost[]>([]);
   const [chatOpen, setChatOpen] = useState<string | null>(null);
-  const [chats, setChats] = useState<Record<string, { from: string; text: string }[]>>({});
+  const [chats, setChats] = useState<Record<string, ChatMessage[]>>({});
   const [chatDraft, setChatDraft] = useState("");
 
   useEffect(() => {
@@ -85,8 +112,23 @@ function TeacherDashboard() {
       try {
         const s = JSON.parse(saved);
         if (s.attendance) setAttendance(s.attendance);
-        if (s.posts) setPosts(s.posts);
-        if (s.chats) setChats(s.chats);
+        if (s.posts) {
+          setPosts(
+            s.posts.map((p: string | AnnouncementPost) =>
+              typeof p === "string" ? { id: crypto.randomUUID(), text: p } : p,
+            ),
+          );
+        }
+        if (s.chats) {
+          const migrated: Record<string, ChatMessage[]> = {};
+          for (const [threadId, msgs] of Object.entries(s.chats as Record<string, unknown[]>)) {
+            migrated[threadId] = (msgs ?? []).map((msg) => {
+              const m = msg as ChatMessage | { from: string; text: string };
+              return "id" in m && m.id ? m : { ...m, id: crypto.randomUUID() };
+            });
+          }
+          setChats(migrated);
+        }
       } catch {}
     }
   }, []);
@@ -99,7 +141,7 @@ function TeacherDashboard() {
 
   const submitAnnouncement = () => {
     if (!announcementText.trim()) return;
-    setPosts((p) => [announcementText, ...p]);
+    setPosts((p) => [{ id: crypto.randomUUID(), text: announcementText }, ...p]);
     setAnnouncementText("");
     setAnnouncementOpen(false);
   };
@@ -108,13 +150,13 @@ function TeacherDashboard() {
     if (!chatOpen || !chatDraft.trim()) return;
     setChats((c) => ({
       ...c,
-      [chatOpen]: [...(c[chatOpen] ?? []), { from: "Teacher", text: chatDraft }],
+      [chatOpen]: [...(c[chatOpen] ?? []), { id: crypto.randomUUID(), from: "Teacher", text: chatDraft }],
     }));
     setChatDraft("");
     setTimeout(() => {
       setChats((c) => ({
         ...c,
-        [chatOpen]: [...(c[chatOpen] ?? []), { from: "Parent", text: "Got it, thank you! 🙏" }],
+        [chatOpen]: [...(c[chatOpen] ?? []), { id: crypto.randomUUID(), from: "Parent", text: "Got it, thank you! 🙏" }],
       }));
     }, 800);
   };
@@ -131,13 +173,13 @@ function TeacherDashboard() {
             <button className="relative flex items-center gap-1.5 rounded-full border-2 border-border bg-card px-3 py-1.5 text-sm font-bold hover:bg-muted">
               <MessageCircle className="size-4" />{" "}
               <span className="hidden sm:inline">Messages</span>
-              <span className="grid size-4 place-items-center rounded-full bg-[var(--duo-red)] text-[10px] text-white">
+              <span className="grid size-4 place-items-center rounded-full bg-duo-red text-[10px] text-white">
                 3
               </span>
             </button>
             <button className="relative flex items-center gap-1.5 rounded-full border-2 border-border bg-card px-3 py-1.5 text-sm font-bold hover:bg-muted">
               <Bell className="size-4" />
-              <span className="grid size-4 place-items-center rounded-full bg-[var(--duo-red)] text-[10px] text-white">
+              <span className="grid size-4 place-items-center rounded-full bg-duo-red text-[10px] text-white">
                 5
               </span>
             </button>
@@ -163,14 +205,14 @@ function TeacherDashboard() {
                   key={n.label}
                   className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold transition ${
                     n.active
-                      ? "bg-[oklch(0.95_0.08_240)] text-[var(--duo-blue)]"
+                      ? "bg-[oklch(0.95_0.08_240)] text-duo-blue"
                       : "text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   <n.icon className="size-4" />
                   <span className="flex-1 text-left">{n.label}</span>
                   {n.badge && (
-                    <span className="rounded-full bg-[var(--duo-green)] px-1.5 py-0.5 text-[9px] text-white">
+                    <span className="rounded-full bg-duo-green px-1.5 py-0.5 text-[9px] text-white">
                       {n.badge}
                     </span>
                   )}
@@ -188,11 +230,11 @@ function TeacherDashboard() {
                   onClick={() => setActiveClass(c.id)}
                   className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold transition ${
                     activeClass === c.id
-                      ? "bg-[oklch(0.95_0.07_295)] text-[var(--duo-purple)]"
+                      ? "bg-[oklch(0.95_0.07_295)] text-duo-purple"
                       : "text-muted-foreground hover:bg-muted"
                   }`}
                 >
-                  <span className="grid size-7 place-items-center rounded-lg bg-[oklch(0.92_0.1_295)] text-[10px] font-bold text-[var(--duo-purple)]">
+                  <span className="grid size-7 place-items-center rounded-lg bg-[oklch(0.92_0.1_295)] text-[10px] font-bold text-duo-purple">
                     {c.id.toUpperCase()}
                   </span>
                   {c.name}
@@ -203,7 +245,7 @@ function TeacherDashboard() {
               </button>
             </div>
             <div className="mt-4 rounded-xl bg-[oklch(0.95_0.07_295)] p-3 text-xs">
-              <div className="flex items-center gap-2 font-bold text-[var(--duo-purple)]">
+              <div className="flex items-center gap-2 font-bold text-duo-purple">
                 <HelpCircle className="size-4" /> Help & Support
               </div>
             </div>
@@ -228,17 +270,19 @@ function TeacherDashboard() {
           <DuoCard>
             <div className="mb-3 flex items-center justify-between">
               <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-                <Calendar className="size-5 text-[var(--duo-blue)]" /> Today's Schedule
+                <Calendar className="size-5 text-duo-blue" /> Today's Schedule
               </h2>
-              <button className="text-xs font-bold text-[var(--duo-blue)] hover:underline">
+              <button className="text-xs font-bold text-duo-blue hover:underline">
                 View full calendar →
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {SCHEDULE.map((s, i) => (
+              {SCHEDULE.map((s) => {
+                const isCurrent = s.time === SCHEDULE[0].time && s.subject === SCHEDULE[0].subject;
+                return (
                 <div
-                  key={i}
-                  className={`min-w-[200px] shrink-0 rounded-2xl border-2 p-3 ${i === 0 ? "border-[var(--duo-purple)] bg-[oklch(0.97_0.05_295)]" : "border-border bg-card"}`}
+                  key={`${s.time}-${s.subject}`}
+                  className={`min-w-[200px] shrink-0 rounded-2xl border-2 p-3 ${isCurrent ? "border-duo-purple bg-[oklch(0.97_0.05_295)]" : "border-border bg-card"}`}
                 >
                   <div className="mb-2 text-[11px] font-bold uppercase text-muted-foreground">
                     {s.time}
@@ -248,7 +292,7 @@ function TeacherDashboard() {
                       className="grid size-8 place-items-center rounded-lg text-base"
                       style={{ background: `var(--${s.color})`, color: "white" }}
                     >
-                      {["🧪", "🔢", "📖", "🍽️", "🎨"][i]}
+                      {SCHEDULE_ICONS[s.subject] ?? "📚"}
                     </span>
                     <span className="font-bold">{s.subject}</span>
                   </div>
@@ -257,7 +301,8 @@ function TeacherDashboard() {
                     📍 {s.room}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </DuoCard>
 
@@ -273,7 +318,7 @@ function TeacherDashboard() {
                       ? setAnnouncementOpen(true)
                       : alert(`${q.label} composer coming soon!`)
                   }
-                  className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border p-3 text-xs font-bold transition hover:-translate-y-0.5 hover:border-[var(--duo-purple)]"
+                  className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border p-3 text-xs font-bold transition hover:-translate-y-0.5 hover:border-duo-purple"
                 >
                   <q.icon className="size-5" style={{ color: `var(--${q.color})` }} />
                   {q.label}
@@ -281,12 +326,12 @@ function TeacherDashboard() {
               ))}
             </div>
             {announcementOpen && (
-              <div className="mt-4 rounded-2xl border-2 border-[var(--duo-red)] bg-[oklch(0.97_0.04_25)] p-3 animate-pop-in">
+              <div className="mt-4 rounded-2xl border-2 border-duo-red bg-[oklch(0.97_0.04_25)] p-3 animate-pop-in">
                 <textarea
                   value={announcementText}
                   onChange={(e) => setAnnouncementText(e.target.value)}
                   placeholder="Type your announcement to parents…"
-                  className="w-full resize-none rounded-xl border-2 border-border bg-card p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--duo-red)]"
+                  className="w-full resize-none rounded-xl border-2 border-border bg-card p-2 text-sm focus:outline-none focus:ring-2 focus:ring-duo-red"
                   rows={3}
                 />
                 <div className="mt-2 flex justify-end gap-2">
@@ -302,12 +347,12 @@ function TeacherDashboard() {
             {posts.length > 0 && (
               <div className="mt-3 space-y-2">
                 <div className="text-xs font-bold text-muted-foreground">Recent posts</div>
-                {posts.map((p, i) => (
-                  <div key={i} className="rounded-xl border-2 border-border bg-card p-3 text-sm">
-                    <div className="mb-1 flex items-center gap-2 text-xs font-bold text-[var(--duo-red)]">
+                {posts.map((p) => (
+                  <div key={p.id} className="rounded-xl border-2 border-border bg-card p-3 text-sm">
+                    <div className="mb-1 flex items-center gap-2 text-xs font-bold text-duo-red">
                       <Megaphone className="size-3" /> Announcement
                     </div>
-                    {p}
+                    {p.text}
                   </div>
                 ))}
               </div>
@@ -345,7 +390,7 @@ function TeacherDashboard() {
                     key={c.id}
                     className="flex items-center gap-3 rounded-xl border-2 border-border p-3"
                   >
-                    <span className="grid size-9 place-items-center rounded-lg bg-[oklch(0.92_0.1_295)] text-xs font-bold text-[var(--duo-purple)]">
+                    <span className="grid size-9 place-items-center rounded-lg bg-[oklch(0.92_0.1_295)] text-xs font-bold text-duo-purple">
                       {c.id.toUpperCase()}
                     </span>
                     <div className="flex-1">
@@ -353,7 +398,7 @@ function TeacherDashboard() {
                       <div className="text-xs text-muted-foreground">{c.students} students</div>
                     </div>
                     <div className="text-right">
-                      <div className="font-numeric text-lg font-bold text-[var(--duo-green)]">
+                      <div className="font-numeric text-lg font-bold text-duo-green">
                         {c.attendance}%
                       </div>
                       <div className="text-[10px] font-bold text-muted-foreground">Attendance</div>
@@ -364,7 +409,7 @@ function TeacherDashboard() {
             </DuoCard>
 
             <DuoCard accent="green">
-              <h2 className="mb-3 font-display text-lg font-bold text-[var(--duo-green-dark)]">
+              <h2 className="mb-3 font-display text-lg font-bold text-duo-green-dark">
                 Quick Actions
               </h2>
               <ul className="space-y-2">
@@ -453,7 +498,7 @@ function TeacherDashboard() {
                             onClick={() => togglePresent(s.id)}
                             className={`grid size-7 place-items-center rounded-md border-2 transition ${
                               attendance[s.id]
-                                ? "border-[var(--duo-green)] bg-[var(--duo-green)] text-white"
+                                ? "border-duo-green bg-duo-green text-white"
                                 : "border-border bg-card"
                             }`}
                           >
@@ -475,7 +520,7 @@ function TeacherDashboard() {
             </DuoCard>
 
             <DuoCard accent="green">
-              <h2 className="mb-3 font-display text-lg font-bold text-[var(--duo-green-dark)]">
+              <h2 className="mb-3 font-display text-lg font-bold text-duo-green-dark">
                 Chat with Parents
               </h2>
               <ul className="space-y-2">
@@ -485,7 +530,7 @@ function TeacherDashboard() {
                       onClick={() => setChatOpen(chatOpen === m.id ? null : m.id)}
                       className={`flex w-full items-center gap-3 rounded-xl border-2 p-2.5 text-left transition ${
                         chatOpen === m.id
-                          ? "border-[var(--duo-green)] bg-[oklch(0.97_0.06_145)]"
+                          ? "border-duo-green bg-[oklch(0.97_0.06_145)]"
                           : "border-border bg-card hover:bg-muted"
                       }`}
                     >
@@ -500,7 +545,7 @@ function TeacherDashboard() {
                         <div className="truncate text-xs text-muted-foreground">{m.preview}</div>
                       </div>
                       {m.unread > 0 && (
-                        <span className="grid size-5 place-items-center rounded-full bg-[var(--duo-green)] text-[10px] font-bold text-white">
+                        <span className="grid size-5 place-items-center rounded-full bg-duo-green text-[10px] font-bold text-white">
                           {m.unread}
                         </span>
                       )}
@@ -511,13 +556,13 @@ function TeacherDashboard() {
                           <div className="text-xs">
                             <span className="font-bold">{m.from}:</span> {m.preview}
                           </div>
-                          {(chats[m.id] ?? []).map((c, i) => (
+                          {(chats[m.id] ?? []).map((c) => (
                             <div
-                              key={i}
+                              key={c.id}
                               className={`flex ${c.from === "Teacher" ? "justify-end" : "justify-start"}`}
                             >
                               <div
-                                className={`max-w-[80%] rounded-xl px-2.5 py-1.5 text-xs ${c.from === "Teacher" ? "bg-[var(--duo-green)] text-white" : "bg-card border-2 border-border"}`}
+                                className={`max-w-[80%] rounded-xl px-2.5 py-1.5 text-xs ${c.from === "Teacher" ? "bg-duo-green text-white" : "bg-card border-2 border-border"}`}
                               >
                                 {c.text}
                               </div>
@@ -535,7 +580,7 @@ function TeacherDashboard() {
                             value={chatDraft}
                             onChange={(e) => setChatDraft(e.target.value)}
                             placeholder="Reply…"
-                            className="flex-1 rounded-lg border-2 border-border bg-card px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--duo-green)]"
+                            className="flex-1 rounded-lg border-2 border-border bg-card px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-duo-green"
                           />
                           <DuoButton size="sm" variant="green" type="submit">
                             <Send className="size-3" />
@@ -587,21 +632,15 @@ function TeacherDashboard() {
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 grid grid-cols-5 border-t-2 border-border bg-card md:hidden">
-        {[
-          { icon: Home, label: "Home", active: true },
-          { icon: BookOpen, label: "Classes" },
-          { icon: Plus, label: "" },
-          { icon: MessageCircle, label: "Chat" },
-          { icon: Settings, label: "Me" },
-        ].map((n, i) => (
+        {MOBILE_NAV.map((n) => (
           <button
-            key={i}
+            key={n.id}
             className={`flex flex-col items-center gap-0.5 py-2.5 text-xs font-bold ${
-              i === 2 ? "-mt-4" : n.active ? "text-[var(--duo-blue)]" : "text-muted-foreground"
+              n.center ? "-mt-4" : n.active ? "text-duo-blue" : "text-muted-foreground"
             }`}
           >
-            {i === 2 ? (
-              <span className="grid size-12 place-items-center rounded-full bg-[var(--duo-purple)] text-white shadow-lg">
+            {n.center ? (
+              <span className="grid size-12 place-items-center rounded-full bg-duo-purple text-white shadow-lg">
                 <Plus className="size-6" />
               </span>
             ) : (

@@ -23,13 +23,12 @@ import { AssignmentCardDetailDialog } from "@/components/assignment-card-detail-
 import { cn } from "@/lib/utils";
 import { GripVertical, MessageSquare, FileText, ClipboardList } from "lucide-react";
 
-function KanbanCard({
-  card,
-  onOpen,
-}: {
+type KanbanCardProps = {
   card: KanbanAssignmentCard;
   onOpen: (card: KanbanAssignmentCard) => void;
-}) {
+};
+
+function KanbanCard({ card, onOpen }: Readonly<KanbanCardProps>) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: card.id,
     data: { type: "card", columnId: card.columnId },
@@ -76,18 +75,18 @@ function KanbanCard({
           </div>
           <div className="mt-2 flex items-center justify-between gap-1 text-[10px] text-muted-foreground">
             <span>Due {card.due}</span>
-            <span className="font-numeric font-bold text-[var(--duo-green-dark)]">
+            <span className="font-numeric font-bold text-duo-green-dark">
               +{card.points}
             </span>
           </div>
           <div className="mt-1.5 flex items-center gap-2">
             {card.kind === "quiz" ? (
-              <span className="flex items-center gap-0.5 text-[9px] font-bold text-[var(--duo-purple)]">
+              <span className="flex items-center gap-0.5 text-[9px] font-bold text-duo-purple">
                 <ClipboardList className="size-3" />
                 Quiz
               </span>
             ) : (
-              <span className="flex items-center gap-0.5 text-[9px] font-bold text-[var(--duo-blue)]">
+              <span className="flex items-center gap-0.5 text-[9px] font-bold text-duo-blue">
                 <FileText className="size-3" />
                 Docs
               </span>
@@ -110,7 +109,11 @@ function KanbanCard({
   );
 }
 
-function KanbanCardPreview({ card }: { card: KanbanAssignmentCard }) {
+type KanbanCardPreviewProps = {
+  card: KanbanAssignmentCard;
+};
+
+function KanbanCardPreview({ card }: Readonly<KanbanCardPreviewProps>) {
   return (
     <article className="rotate-2 rounded-lg border border-border bg-card p-2.5 shadow-lg">
       <div className="flex items-start gap-2">
@@ -124,19 +127,15 @@ function KanbanCardPreview({ card }: { card: KanbanAssignmentCard }) {
   );
 }
 
-function KanbanColumn({
-  columnId,
-  title,
-  accent,
-  cards,
-  onOpenCard,
-}: {
+type KanbanColumnProps = {
   columnId: KanbanColumnId;
   title: string;
   accent: string;
   cards: KanbanAssignmentCard[];
   onOpenCard: (card: KanbanAssignmentCard) => void;
-}) {
+};
+
+function KanbanColumn({ columnId, title, accent, cards, onOpenCard }: Readonly<KanbanColumnProps>) {
   const { setNodeRef, isOver } = useDroppable({ id: columnId, data: { type: "column", columnId } });
   const cardIds = cards.map((c) => c.id);
 
@@ -145,7 +144,7 @@ function KanbanColumn({
       className={cn(
         "flex w-[272px] shrink-0 flex-col rounded-xl",
         accent,
-        isOver && "ring-2 ring-[var(--duo-blue)] ring-offset-2",
+        isOver && "ring-2 ring-duo-blue ring-offset-2",
       )}
     >
       <div className="flex items-center justify-between px-3 py-2.5">

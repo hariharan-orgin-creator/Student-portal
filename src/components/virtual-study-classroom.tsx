@@ -41,20 +41,19 @@ import {
   Rocket,
 } from "lucide-react";
 
-function StudyParticipantTile({
-  participant,
-  cameraOn,
-}: {
+type StudyParticipantTileProps = {
   participant: FocusBuddy;
   cameraOn: boolean;
-}) {
+};
+
+function StudyParticipantTile({ participant, cameraOn }: Readonly<StudyParticipantTileProps>) {
   const isBreak = participant.status === "break";
 
   return (
     <div
       className={cn(
-        "group relative aspect-[4/3] overflow-hidden rounded-lg bg-[oklch(0.18_0.02_260)] shadow-md transition hover:ring-2 hover:ring-white/30",
-        participant.isMe && "ring-2 ring-[var(--duo-green)]",
+        "group relative aspect-4/3 overflow-hidden rounded-lg bg-[oklch(0.18_0.02_260)] shadow-md transition hover:ring-2 hover:ring-white/30",
+        participant.isMe && "ring-2 ring-duo-green",
       )}
     >
       <img
@@ -70,13 +69,13 @@ function StudyParticipantTile({
 
       {isBreak && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-          <span className="font-display text-lg font-bold text-[var(--duo-green)]">BREAK</span>
+          <span className="font-display text-lg font-bold text-duo-green">BREAK</span>
           <span className="font-numeric text-2xl font-bold text-white">5:00</span>
         </div>
       )}
 
       <div className="absolute left-1 top-1 flex items-center gap-0.5 rounded-md bg-black/55 px-1.5 py-0.5 backdrop-blur-sm">
-        <Rocket className="size-2.5 text-[var(--duo-yellow)]" />
+        <Rocket className="size-2.5 text-duo-yellow" />
         <span className="font-numeric text-[9px] font-bold text-white">
           {participant.focusMinutes ?? 0}
         </span>
@@ -84,12 +83,12 @@ function StudyParticipantTile({
       </div>
 
       {participant.badge != null && (
-        <span className="absolute right-1 top-1 rounded bg-[var(--duo-yellow)] px-1 py-0.5 font-numeric text-[9px] font-extrabold text-[oklch(0.3_0.08_80)] shadow-sm">
+        <span className="absolute right-1 top-1 rounded bg-duo-yellow px-1 py-0.5 font-numeric text-[9px] font-extrabold text-[oklch(0.3_0.08_80)] shadow-sm">
           {participant.badge}
         </span>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-1.5 pb-1 pt-6">
+      <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/85 via-black/40 to-transparent px-1.5 pb-1 pt-6">
         <p className="truncate text-[10px] font-bold text-white">
           {participant.name}
           {participant.isMe && " · You"}
@@ -108,13 +107,12 @@ function StudyParticipantTile({
   );
 }
 
-function WhatsAppTeacherChat({
-  messages,
-  onSend,
-}: {
+type WhatsAppTeacherChatProps = {
   messages: TeacherChatMessage[];
   onSend: (text: string) => void;
-}) {
+};
+
+function WhatsAppTeacherChat({ messages, onSend }: Readonly<WhatsAppTeacherChatProps>) {
   const [draft, setDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -165,7 +163,7 @@ function WhatsAppTeacherChat({
                   <CheckCheck
                     className={cn(
                       "size-3",
-                      m.read ? "text-[var(--duo-blue)]" : "text-muted-foreground",
+                      m.read ? "text-duo-blue" : "text-muted-foreground",
                     )}
                   />
                 )}
@@ -186,7 +184,7 @@ function WhatsAppTeacherChat({
         <button
           type="button"
           onClick={send}
-          className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--duo-green)] text-white"
+          className="grid size-9 shrink-0 place-items-center rounded-full bg-duo-green text-white"
         >
           <Send className="size-4" />
         </button>
@@ -195,7 +193,12 @@ function WhatsAppTeacherChat({
   );
 }
 
-function BookReader({ book, onClose }: { book: CourseBook; onClose: () => void }) {
+type BookReaderProps = {
+  book: CourseBook;
+  onClose: () => void;
+};
+
+function BookReader({ book, onClose }: Readonly<BookReaderProps>) {
   const [page, setPage] = useState(book.currentPage);
 
   return (
@@ -315,7 +318,7 @@ export function VirtualStudyClassroom() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 rounded-full bg-[var(--duo-red)] px-2 py-0.5 text-[10px] font-bold uppercase text-white">
+            <span className="flex items-center gap-1 rounded-full bg-duo-red px-2 py-0.5 text-[10px] font-bold uppercase text-white">
               <Radio className="size-3 animate-pulse" />
               Live
             </span>
@@ -333,7 +336,7 @@ export function VirtualStudyClassroom() {
         <div className="flex flex-col gap-3">
           <DuoCard className="overflow-hidden bg-[oklch(0.94_0.01_90)] p-2 sm:p-3">
             {screenSharing && (
-              <div className="mb-2 flex items-center gap-2 rounded-lg bg-[var(--duo-blue)]/15 px-3 py-2 text-xs font-bold text-[var(--duo-blue)]">
+              <div className="mb-2 flex items-center gap-2 rounded-lg bg-(--duo-blue)/15 px-3 py-2 text-xs font-bold text-duo-blue">
                 <MonitorUp className="size-4" />
                 You are sharing your screen with the study room
               </div>
@@ -350,7 +353,7 @@ export function VirtualStudyClassroom() {
                 onClick={() => setMicOn((m) => !m)}
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold text-white",
-                  micOn ? "bg-white/15" : "bg-[var(--duo-red)]",
+                  micOn ? "bg-white/15" : "bg-duo-red",
                 )}
               >
                 {micOn ? <Mic className="size-4" /> : <MicOff className="size-4" />}
@@ -361,7 +364,7 @@ export function VirtualStudyClassroom() {
                 onClick={() => setCameraOn((c) => !c)}
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold text-white",
-                  cameraOn ? "bg-white/15" : "bg-[var(--duo-red)]",
+                  cameraOn ? "bg-white/15" : "bg-duo-red",
                 )}
               >
                 {cameraOn ? <Video className="size-4" /> : <VideoOff className="size-4" />}
@@ -372,7 +375,7 @@ export function VirtualStudyClassroom() {
                 onClick={() => setScreenSharing((s) => !s)}
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold text-white",
-                  screenSharing ? "bg-[var(--duo-blue)]" : "bg-white/15",
+                  screenSharing ? "bg-duo-blue" : "bg-white/15",
                 )}
               >
                 <MonitorUp className="size-4" />
@@ -444,7 +447,7 @@ export function VirtualStudyClassroom() {
                       <div
                         className={cn(
                           "max-w-[80%] rounded-lg px-2 py-1.5",
-                          m.isMe ? "bg-[var(--duo-green)]/15" : "bg-card",
+                          m.isMe ? "bg-(--duo-green)/15" : "bg-card",
                         )}
                       >
                         <p className="text-[10px] font-bold text-muted-foreground">
@@ -468,7 +471,7 @@ export function VirtualStudyClassroom() {
                 <button
                   type="button"
                   onClick={sendClassMessage}
-                  className="grid size-9 place-items-center rounded-full bg-[var(--duo-green)] text-white"
+                  className="grid size-9 place-items-center rounded-full bg-duo-green text-white"
                 >
                   <Send className="size-4" />
                 </button>
@@ -508,7 +511,7 @@ export function VirtualStudyClassroom() {
                       className={cn(
                         "flex w-full items-center gap-2 rounded-xl p-2.5 text-left transition",
                         joinedGroup === g.id
-                          ? "bg-[oklch(0.95_0.08_145)] ring-2 ring-[var(--duo-green)]"
+                          ? "bg-[oklch(0.95_0.08_145)] ring-2 ring-duo-green"
                           : "bg-muted/40 hover:bg-muted",
                       )}
                     >
@@ -521,7 +524,7 @@ export function VirtualStudyClassroom() {
                         </p>
                       </div>
                       {joinedGroup === g.id && (
-                        <span className="text-[10px] font-bold text-[var(--duo-green-dark)]">
+                        <span className="text-[10px] font-bold text-duo-green-dark">
                           Joined
                         </span>
                       )}
@@ -573,15 +576,13 @@ export function VirtualStudyClassroom() {
   );
 }
 
-function BuddyRow({
-  buddy,
-  selected,
-  onToggle,
-}: {
+type BuddyRowProps = {
   buddy: FocusBuddy;
   selected: boolean;
   onToggle: () => void;
-}) {
+};
+
+function BuddyRow({ buddy, selected, onToggle }: Readonly<BuddyRowProps>) {
   const statusColor = {
     studying: "bg-[var(--duo-green)]",
     break: "bg-[var(--duo-yellow)]",
@@ -608,7 +609,7 @@ function BuddyRow({
       </div>
       <div className="flex items-center gap-2">
         {buddy.cameraOn ? (
-          <Video className="size-3.5 text-[var(--duo-green)]" />
+          <Video className="size-3.5 text-duo-green" />
         ) : (
           <VideoOff className="size-3.5 text-muted-foreground" />
         )}

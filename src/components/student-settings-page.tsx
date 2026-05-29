@@ -43,15 +43,13 @@ const sections = [
 
 type SectionId = (typeof sections)[number]["id"];
 
-function SettingRow({
-  label,
-  description,
-  children,
-}: {
+type SettingRowProps = {
   label: string;
   description?: string;
   children: React.ReactNode;
-}) {
+};
+
+function SettingRow({ label, description, children }: Readonly<SettingRowProps>) {
   return (
     <div className="flex items-start justify-between gap-3 border-b border-border/40 py-2.5 last:border-0">
       <div className="min-w-0 flex-1">
@@ -63,17 +61,14 @@ function SettingRow({
   );
 }
 
-function ChipSelect({
-  options,
-  selected,
-  onChange,
-  multi = false,
-}: {
+type ChipSelectProps = {
   options: string[];
   selected: string | string[];
   onChange: (value: string) => void;
   multi?: boolean;
-}) {
+};
+
+function ChipSelect({ options, selected, onChange, multi = false }: Readonly<ChipSelectProps>) {
   const isSelected = (opt: string) =>
     multi ? (selected as string[]).includes(opt) : selected === opt;
 
@@ -87,7 +82,7 @@ function ChipSelect({
           className={cn(
             "rounded-full px-2.5 py-1 text-[10px] font-bold transition",
             isSelected(opt)
-              ? "bg-[var(--duo-green)] text-white"
+              ? "bg-duo-green text-white"
               : "bg-muted text-muted-foreground hover:bg-muted/80",
           )}
         >
@@ -172,7 +167,7 @@ export function StudentSettingsPage() {
               className={cn(
                 "flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2 text-left text-[10px] font-bold transition md:w-full md:text-xs",
                 activeSection === s.id
-                  ? "bg-[oklch(0.95_0.08_145)] text-[var(--duo-green-dark)]"
+                  ? "bg-[oklch(0.95_0.08_145)] text-duo-green-dark"
                   : "text-muted-foreground hover:bg-muted",
               )}
             >
@@ -233,7 +228,7 @@ export function StudentSettingsPage() {
                       className={cn(
                         "grid size-11 place-items-center rounded-full text-2xl ring-2 transition",
                         settings.identity.avatar === a
-                          ? "ring-[var(--duo-green)] bg-[oklch(0.95_0.08_145)]"
+                          ? "ring-duo-green bg-[oklch(0.95_0.08_145)]"
                           : "ring-transparent bg-muted hover:ring-border",
                       )}
                     >
@@ -323,7 +318,7 @@ export function StudentSettingsPage() {
                 ].map((opt) => (
                   <label
                     key={opt.value}
-                    className="flex cursor-pointer items-start gap-2 rounded-lg border border-border/60 p-2.5 has-[[data-state=checked]]:border-[var(--duo-green)] has-[[data-state=checked]]:bg-[oklch(0.97_0.06_145)]"
+                    className="flex cursor-pointer items-start gap-2 rounded-lg border border-border/60 p-2.5 has-data-[state=checked]:border-duo-green has-data-[state=checked]:bg-[oklch(0.97_0.06_145)]"
                   >
                     <RadioGroupItem value={opt.value} className="mt-0.5" />
                     <div>
@@ -501,7 +496,7 @@ export function StudentSettingsPage() {
                 ].map((opt) => (
                   <label
                     key={opt.value}
-                    className="flex cursor-pointer items-start gap-2 rounded-lg border border-border/60 p-2.5 has-[[data-state=checked]]:border-[var(--duo-purple)] has-[[data-state=checked]]:bg-[oklch(0.97_0.04_295)]"
+                    className="flex cursor-pointer items-start gap-2 rounded-lg border border-border/60 p-2.5 has-data-[state=checked]:border-duo-purple has-data-[state=checked]:bg-[oklch(0.97_0.04_295)]"
                   >
                     <RadioGroupItem value={opt.value} className="mt-0.5" />
                     <div>
@@ -565,7 +560,7 @@ export function StudentSettingsPage() {
                       className={cn(
                         "rounded-full px-3 py-1 text-[10px] font-bold",
                         settings.accessibility.language === lang.id
-                          ? "bg-[var(--duo-green)] text-white"
+                          ? "bg-duo-green text-white"
                           : "bg-muted",
                       )}
                     >

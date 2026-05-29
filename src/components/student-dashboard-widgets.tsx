@@ -112,13 +112,15 @@ export function getRecommendedAction(): RecommendedAction {
   };
 }
 
+type RecommendedNextActionWidgetProps = {
+  compact?: boolean;
+  embedded?: boolean;
+};
+
 export function RecommendedNextActionWidget({
   compact = false,
   embedded = false,
-}: {
-  compact?: boolean;
-  embedded?: boolean;
-}) {
+}: Readonly<RecommendedNextActionWidgetProps>) {
   const action = useMemo(() => getRecommendedAction(), []);
   const [checked, setChecked] = useState(false);
 
@@ -147,7 +149,7 @@ export function RecommendedNextActionWidget({
       >
         <h2
           className={cn(
-            "flex items-center gap-1.5 font-bold text-[var(--duo-green-dark)]",
+            "flex items-center gap-1.5 font-bold text-duo-green-dark",
             embedded || compact ? "text-xs" : "font-display text-lg",
           )}
         >
@@ -161,14 +163,14 @@ export function RecommendedNextActionWidget({
         className={cn(
           "flex cursor-pointer items-start gap-2 rounded-xl bg-muted/40 transition hover:bg-muted/60",
           embedded || compact ? "bg-card/90 p-2" : "gap-4 rounded-2xl bg-card p-4",
-          checked && "bg-[oklch(0.98_0.04_145)] ring-1 ring-[var(--duo-green)]",
+          checked && "bg-[oklch(0.98_0.04_145)] ring-1 ring-duo-green",
         )}
       >
         <Checkbox
           checked={checked}
           onCheckedChange={(v) => toggle(v === true)}
           className={cn(
-            "mt-0.5 shrink-0 rounded-lg border-2 border-[var(--duo-green-dark)] data-[state=checked]:border-[var(--duo-green-dark)] data-[state=checked]:bg-[var(--duo-green)] data-[state=checked]:text-white",
+            "mt-0.5 shrink-0 rounded-lg border-2 border-duo-green-dark data-[state=checked]:border-duo-green-dark data-[state=checked]:bg-duo-green data-[state=checked]:text-white",
             embedded || compact
               ? "size-5 shadow-[0_2px_0_0_var(--duo-green-dark)]"
               : "size-7 shadow-[0_3px_0_0_var(--duo-green-dark)]",
@@ -188,7 +190,7 @@ export function RecommendedNextActionWidget({
               {action.title}
             </span>
             {checked && (
-              <span className="flex items-center gap-0.5 text-[10px] font-bold text-[var(--duo-green-dark)]">
+              <span className="flex items-center gap-0.5 text-[10px] font-bold text-duo-green-dark">
                 <Check className="size-3" /> Done
               </span>
             )}
@@ -220,7 +222,7 @@ export function RecommendedNextActionWidget({
     <DuoCard
       accent="green"
       className={cn(
-        "bg-gradient-to-r from-[oklch(0.97_0.05_145)] to-[oklch(0.95_0.07_145)] transition",
+        "bg-linear-to-r from-[oklch(0.97_0.05_145)] to-[oklch(0.95_0.07_145)] transition",
         compact && "p-3",
         checked && "opacity-90",
       )}
@@ -230,7 +232,11 @@ export function RecommendedNextActionWidget({
   );
 }
 
-export function TodaysClassesWidget({ compact = false }: { compact?: boolean }) {
+type CompactWidgetProps = {
+  compact?: boolean;
+};
+
+export function TodaysClassesWidget({ compact = false }: Readonly<CompactWidgetProps>) {
   const now = TODAYS_CLASSES.find((c) => c.status === "now");
   const classes = compact ? TODAYS_CLASSES.filter((c) => c.status !== "completed") : TODAYS_CLASSES;
 
@@ -239,7 +245,7 @@ export function TodaysClassesWidget({ compact = false }: { compact?: boolean }) 
       <div className={cn("flex items-center justify-between", compact ? "mb-2" : "mb-3")}>
         <h2
           className={cn(
-            "flex items-center gap-1.5 font-bold text-[var(--duo-blue)]",
+            "flex items-center gap-1.5 font-bold text-duo-blue",
             compact ? "text-xs" : "font-display gap-2 text-lg",
           )}
         >
@@ -251,7 +257,7 @@ export function TodaysClassesWidget({ compact = false }: { compact?: boolean }) 
       {now && (
         <div
           className={cn(
-            "rounded-lg bg-[oklch(0.96_0.06_145)] font-bold text-[var(--duo-green-dark)] ring-1 ring-[var(--duo-green)]",
+            "rounded-lg bg-[oklch(0.96_0.06_145)] font-bold text-duo-green-dark ring-1 ring-duo-green",
             compact ? "mb-2 px-2 py-1 text-[10px]" : "mb-3 rounded-xl px-3 py-2 text-sm",
           )}
         >
@@ -267,7 +273,7 @@ export function TodaysClassesWidget({ compact = false }: { compact?: boolean }) 
               className={cn(
                 "flex items-center gap-2 rounded-lg bg-muted/40 transition",
                 compact ? "p-2" : "gap-3 rounded-xl p-3",
-                c.status === "now" && "bg-[oklch(0.98_0.04_145)] ring-1 ring-[var(--duo-green)]",
+                c.status === "now" && "bg-[oklch(0.98_0.04_145)] ring-1 ring-duo-green",
               )}
             >
               <div
@@ -330,15 +336,17 @@ type QuestTask = {
   points: number;
 };
 
+type QuestsAndDeadlinesWidgetProps = {
+  tasks: QuestTask[];
+  onSubmit: (id: string) => void;
+  compact?: boolean;
+};
+
 export function QuestsAndDeadlinesWidget({
   tasks,
   onSubmit,
   compact = false,
-}: {
-  tasks: QuestTask[];
-  onSubmit: (id: string) => void;
-  compact?: boolean;
-}) {
+}: Readonly<QuestsAndDeadlinesWidgetProps>) {
   const questsLeft = tasks.filter((t) => t.status !== "submitted").length;
   const questLimit = compact ? 4 : tasks.length;
   const deadlineLimit = ASSIGNMENT_DEADLINES.length;
@@ -353,7 +361,7 @@ export function QuestsAndDeadlinesWidget({
       >
         <h2
           className={cn(
-            "flex items-center gap-1.5 font-bold text-[var(--duo-orange)]",
+            "flex items-center gap-1.5 font-bold text-duo-orange",
             compact ? "text-xs" : "font-display gap-2 text-lg",
           )}
         >
@@ -478,13 +486,20 @@ export function AttendanceCalendarWidget() {
   const cal = ATTENDANCE_CALENDAR;
   const firstDay = new Date(2026, 4, 1).getDay();
   const atRisk = cal.percentage < cal.required;
+  const paddingCells = useMemo(
+    () =>
+      Array.from({ length: firstDay }, (_, offset) => ({
+        id: `${cal.month}-pad-${offset}`,
+      })),
+    [firstDay, cal.month],
+  );
 
   return (
     <>
       <DuoCard accent={atRisk ? "red" : "green"} className="flex flex-col">
         <div className="mb-3 flex items-start justify-between gap-2">
           <div>
-            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-[var(--duo-purple)]">
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-duo-purple">
               <CalendarDays className="size-5" />
               Attendance
             </h2>
@@ -501,8 +516,8 @@ export function AttendanceCalendarWidget() {
         </div>
 
         {atRisk && (
-          <div className="mb-3 flex items-start gap-2 rounded-xl border-2 border-[var(--duo-red)] bg-[oklch(0.97_0.04_25)] px-3 py-2 text-sm">
-            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--duo-red)]" />
+          <div className="mb-3 flex items-start gap-2 rounded-xl border-2 border-duo-red bg-[oklch(0.97_0.04_25)] px-3 py-2 text-sm">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-duo-red" />
             <p className="font-bold text-[oklch(0.4_0.18_25)]">
               Below {cal.required}% minimum — {cal.required - cal.percentage}% more needed to stay
               safe.
@@ -517,8 +532,8 @@ export function AttendanceCalendarWidget() {
         </div>
 
         <div className="mb-3 grid grid-cols-7 gap-1">
-          {Array.from({ length: firstDay }).map((_, i) => (
-            <div key={`empty-${i}`} />
+          {paddingCells.map((cell) => (
+            <div key={cell.id} />
           ))}
           {cal.days.map((day) => (
             <div
@@ -546,13 +561,13 @@ export function AttendanceCalendarWidget() {
 
         <div className="mb-4 flex flex-wrap gap-3 text-xs font-bold">
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-[var(--duo-green)]" /> Present ({cal.daysPresent})
+            <span className="size-3 rounded bg-duo-green" /> Present ({cal.daysPresent})
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-[var(--duo-red)]" /> Absent ({cal.daysAbsent})
+            <span className="size-3 rounded bg-duo-red" /> Absent ({cal.daysAbsent})
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-3 rounded bg-[var(--duo-yellow)]" /> Late ({cal.daysLate})
+            <span className="size-3 rounded bg-duo-yellow" /> Late ({cal.daysLate})
           </span>
         </div>
 
@@ -609,7 +624,7 @@ export function AttendanceCalendarWidget() {
   );
 }
 
-export function ExamPreparednessWidget({ compact = false }: { compact?: boolean }) {
+export function ExamPreparednessWidget({ compact = false }: Readonly<CompactWidgetProps>) {
   const avg =
     EXAM_PREPAREDNESS.length === 0
       ? 0
@@ -620,7 +635,7 @@ export function ExamPreparednessWidget({ compact = false }: { compact?: boolean 
       <div className={cn("flex items-center justify-between", compact ? "mb-2" : "mb-3")}>
         <h2
           className={cn(
-            "flex items-center gap-1.5 font-bold text-[var(--duo-purple)]",
+            "flex items-center gap-1.5 font-bold text-duo-purple",
             compact ? "text-xs" : "font-display gap-2 text-lg",
           )}
         >
@@ -661,10 +676,10 @@ export function ExamPreparednessWidget({ compact = false }: { compact?: boolean 
                   className={cn(
                     "font-numeric font-bold",
                     compact ? "text-sm" : "text-xl",
-                    color === "green" && "text-[var(--duo-green-dark)]",
-                    color === "blue" && "text-[var(--duo-blue)]",
-                    color === "orange" && "text-[var(--duo-orange)]",
-                    color === "red" && "text-[var(--duo-red)]",
+                    color === "green" && "text-duo-green-dark",
+                    color === "blue" && "text-duo-blue",
+                    color === "orange" && "text-duo-orange",
+                    color === "red" && "text-duo-red",
                   )}
                 >
                   {exam.score}%

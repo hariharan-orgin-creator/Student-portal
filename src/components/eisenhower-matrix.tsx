@@ -63,7 +63,7 @@ const quadrants = [
   },
 ] as const;
 
-function MatrixItemRow({ item }: { item: MatrixItem }) {
+function MatrixItemRow({ item }: Readonly<{ item: MatrixItem }>) {
   return (
     <li
       className={cn("flex items-center gap-2 rounded-lg bg-card/80 p-2", item.done && "opacity-60")}
@@ -87,7 +87,7 @@ function MatrixItemRow({ item }: { item: MatrixItem }) {
           {item.action.label}
         </DuoButton>
       )}
-      {item.done && <span className="text-[10px] font-bold text-[var(--duo-green-dark)]">✓</span>}
+      {item.done && <span className="text-[10px] font-bold text-duo-green-dark">✓</span>}
     </li>
   );
 }
@@ -224,15 +224,17 @@ function buildMatrixItems(
   return { doFirst, schedule, delegate, later };
 }
 
+type EisenhowerMatrixProps = {
+  tasks: QuestTask[];
+  onSubmit: (id: string) => void;
+  recentActivity?: ActivityItem[];
+};
+
 export function EisenhowerMatrix({
   tasks,
   onSubmit,
   recentActivity = RECENT_ACTIVITY,
-}: {
-  tasks: QuestTask[];
-  onSubmit: (id: string) => void;
-  recentActivity?: ActivityItem[];
-}) {
+}: Readonly<EisenhowerMatrixProps>) {
   const items = useMemo(
     () => buildMatrixItems(tasks, onSubmit, recentActivity),
     [tasks, onSubmit, recentActivity],

@@ -26,7 +26,12 @@ const tabs: { id: FeedTab; label: string }[] = [
   { id: "mine", label: "My posts" },
 ];
 
-function FeedPostCard({ post, onLike }: { post: ClassFeedPost; onLike: (id: string) => void }) {
+type FeedPostCardProps = {
+  post: ClassFeedPost;
+  onLike: (id: string) => void;
+};
+
+function FeedPostCard({ post, onLike }: Readonly<FeedPostCardProps>) {
   return (
     <article className="overflow-hidden rounded-xl border border-border/60 bg-card">
       {/* Header — Instagram style */}
