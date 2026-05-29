@@ -45,13 +45,13 @@ export function StudentActivitiesPage() {
     <div className="space-y-4">
       <div className="grid gap-2 sm:grid-cols-3">
         <DuoCard className="p-3 text-center">
-          <p className="font-numeric text-2xl font-extrabold text-[var(--duo-green-dark)]">
+          <p className="font-numeric text-2xl font-extrabold text-duo-green-dark">
             {available.length}
           </p>
           <p className="text-xs font-bold text-muted-foreground">Ready to play</p>
         </DuoCard>
         <DuoCard className="p-3 text-center">
-          <p className="font-numeric text-2xl font-extrabold text-[var(--duo-blue)]">
+          <p className="font-numeric text-2xl font-extrabold text-duo-blue">
             {inProgress.length}
           </p>
           <p className="text-xs font-bold text-muted-foreground">In progress</p>
@@ -114,7 +114,7 @@ export function StudentActivitiesPage() {
                         </p>
 
                         <div className="mt-3 flex items-center justify-between gap-2">
-                          <span className="font-numeric text-xs font-bold text-[var(--duo-yellow)]">
+                          <span className="font-numeric text-xs font-bold text-duo-yellow">
                             +{activity.points} pts
                           </span>
 
@@ -126,7 +126,7 @@ export function StudentActivitiesPage() {
                         </div>
 
                         {activity.status === "completed" ? (
-                          <div className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-[oklch(0.95_0.08_145)] py-2 text-xs font-bold text-[var(--duo-green-dark)]">
+                          <div className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-[oklch(0.95_0.08_145)] py-2 text-xs font-bold text-duo-green-dark">
                             <Check className="size-4" />
                             Completed
                           </div>

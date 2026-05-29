@@ -24,7 +24,7 @@ function StudentPortfolioRoute() {
       </Link>
       <div className="hidden md:block">
         <h1 className="flex items-center gap-2 font-display text-xl font-bold">
-          <FolderOpen className="size-5 text-[var(--duo-blue)]" />
+          <FolderOpen className="size-5 text-duo-blue" />
           My Portfolio
         </h1>
         <p className="text-xs text-muted-foreground">Your progress, badges, and class ranking</p>

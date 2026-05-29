@@ -26,7 +26,7 @@ function StudentExamResultsRoute() {
         Back to dashboard
       </Link>
       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Star className="size-3.5 fill-[var(--duo-yellow)] text-[var(--duo-yellow)]" />
+        <Star className="size-3.5 fill-duo-yellow text-duo-yellow" />
         Mid-year report · personalized for you
       </p>
       <ExamResultsPage />

@@ -24,7 +24,7 @@ function StudentActivitiesRoute() {
       </Link>
       <div>
         <h1 className="flex items-center gap-2 font-display text-xl font-bold">
-          <Gamepad2 className="size-5 text-[var(--duo-orange)]" />
+          <Gamepad2 className="size-5 text-duo-orange" />
           Activities
         </h1>
         <p className="text-xs text-muted-foreground">

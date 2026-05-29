@@ -25,7 +25,7 @@ function StudentAssignmentsPage() {
             Back to dashboard
           </Link>
           <h1 className="flex items-center gap-2 font-display text-xl font-bold">
-            <LayoutGrid className="size-5 text-[var(--duo-green-dark)]" />
+            <LayoutGrid className="size-5 text-duo-green-dark" />
             My Assignments
           </h1>
           <p className="text-xs text-muted-foreground">

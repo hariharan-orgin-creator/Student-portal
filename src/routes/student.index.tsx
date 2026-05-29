@@ -95,7 +95,7 @@ function StudentDashboard() {
 
   return (
     <>
-      <DuoCard className="bg-gradient-to-br from-[oklch(0.96_0.08_145)] to-[oklch(0.9_0.12_145)] p-3">
+      <DuoCard className="bg-linear-to-br from-[oklch(0.96_0.08_145)] to-[oklch(0.9_0.12_145)] p-3">
         <div className="flex items-center gap-3">
           <div className="text-4xl">🦕</div>
           <div className="min-w-0 flex-1">
