@@ -33,7 +33,12 @@ export function DuoButton({
   };
   return (
     <button
-      className={cn("btn-pop inline-flex items-center justify-center gap-2", variantMap[variant], sizes[size], className)}
+      className={cn(
+        "btn-pop inline-flex items-center justify-center gap-2",
+        variantMap[variant],
+        sizes[size],
+        className,
+      )}
       {...props}
     >
       {children}
@@ -41,18 +46,27 @@ export function DuoButton({
   );
 }
 
-export function DuoCard({ children, className, accent }: { children: ReactNode; className?: string; accent?: Variant }) {
-  return (
-    <div
-      className={cn("card-pop p-5", className)}
-      style={accent ? { borderColor: `var(--${accent === "white" ? "border" : accent})` } : undefined}
-    >
-      {children}
-    </div>
-  );
+export function DuoCard({
+  children,
+  className,
+  accent: _accent,
+}: {
+  children: ReactNode;
+  className?: string;
+  accent?: Variant;
+}) {
+  return <div className={cn("card-pop p-5", className)}>{children}</div>;
 }
 
-export function DuoProgress({ value, label, color = "green" }: { value: number; label?: string; color?: Variant }) {
+export function DuoProgress({
+  value,
+  label,
+  color = "green",
+}: {
+  value: number;
+  label?: string;
+  color?: Variant;
+}) {
   const colorMap: Record<string, string> = {
     green: "linear-gradient(180deg, oklch(0.82 0.19 145), oklch(0.65 0.2 145))",
     blue: "linear-gradient(180deg, oklch(0.78 0.16 240), oklch(0.6 0.18 240))",
@@ -65,9 +79,17 @@ export function DuoProgress({ value, label, color = "green" }: { value: number; 
   };
   return (
     <div className="space-y-1">
-      {label && <div className="flex justify-between text-xs font-bold text-muted-foreground"><span>{label}</span><span>{value}%</span></div>}
+      {label && (
+        <div className="flex justify-between text-xs font-bold text-muted-foreground">
+          <span>{label}</span>
+          <span className="font-numeric">{value}%</span>
+        </div>
+      )}
       <div className="progress-track">
-        <div className="progress-fill" style={{ width: `${Math.min(100, Math.max(0, value))}%`, background: colorMap[color] }} />
+        <div
+          className="progress-fill"
+          style={{ width: `${Math.min(100, Math.max(0, value))}%`, background: colorMap[color] }}
+        />
       </div>
     </div>
   );
@@ -84,5 +106,14 @@ export function Chip({ children, color = "green" }: { children: ReactNode; color
     pink: "bg-[oklch(0.95_0.06_350)] text-[oklch(0.45_0.15_350)]",
     white: "bg-muted text-foreground",
   };
-  return <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide", map[color])}>{children}</span>;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide",
+        map[color],
+      )}
+    >
+      {children}
+    </span>
+  );
 }

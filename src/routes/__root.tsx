@@ -73,13 +73,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "SkoolDojo — Joyful school portal" },
-      { name: "description", content: "A playful, integrated school management portal for students, parents and teachers." },
+      {
+        name: "description",
+        content:
+          "A playful, integrated school management portal for students, parents and teachers.",
+      },
       { property: "og:title", content: "SkoolDojo" },
-      { property: "og:description", content: "Connect students, parents and teachers with a single joyful portal." },
+      {
+        property: "og:description",
+        content: "Connect students, parents and teachers with a single joyful portal.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
     links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Nunito+Sans:ital,opsz,wght@0,6..12,400..800;1,6..12,400..800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,

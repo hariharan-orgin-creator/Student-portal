@@ -6,9 +6,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "SkoolDojo — Connect students, parents & teachers" },
-      { name: "description", content: "A playful, integrated school management portal inspired by ClassDojo and Duolingo. Pick your role to begin." },
+      {
+        name: "description",
+        content:
+          "A playful, integrated school management portal inspired by ClassDojo and Duolingo. Pick your role to begin.",
+      },
       { property: "og:title", content: "SkoolDojo — A joyful school portal" },
-      { property: "og:description", content: "Three connected dashboards for students, parents, and teachers." },
+      {
+        property: "og:description",
+        content: "Three connected dashboards for students, parents, and teachers.",
+      },
     ],
   }),
   component: Landing,
@@ -51,10 +58,12 @@ function Landing() {
             School portal, reimagined
           </div>
           <h1 className="font-display text-5xl font-bold md:text-7xl">
-            Welcome to <span className="text-[var(--duo-green)]">SkoolDojo</span> <span className="inline-block hover-wiggle">🎒</span>
+            Welcome to <span className="text-[var(--duo-green)]">SkoolDojo</span>{" "}
+            <span className="inline-block hover-wiggle">🎒</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:text-lg">
-            A joyful, gamified portal that connects students, parents, and teachers — all in one place.
+            A joyful, gamified portal that connects students, parents, and teachers — all in one
+            place.
           </p>
         </header>
 
@@ -65,11 +74,15 @@ function Landing() {
               to={r.to}
               className={`card-pop group relative overflow-hidden bg-gradient-to-br ${r.bg} p-8 transition-transform hover:-translate-y-1`}
             >
-              <div className="mb-4 text-6xl transition-transform group-hover:scale-110">{r.icon}</div>
+              <div className="mb-4 text-6xl transition-transform group-hover:scale-110">
+                {r.icon}
+              </div>
               <h2 className="font-display text-2xl font-bold">{r.title}</h2>
               <p className="mt-2 text-sm text-foreground/70">{r.desc}</p>
               <div className="mt-6">
-                <DuoButton variant={r.variant} size="md">Continue →</DuoButton>
+                <DuoButton variant={r.variant} size="md">
+                  Continue →
+                </DuoButton>
               </div>
             </Link>
           ))}
@@ -82,7 +95,9 @@ function Landing() {
             { icon: <Sparkles className="size-5" />, label: "Teachers save hours weekly" },
           ].map((f) => (
             <div key={f.label} className="card-pop flex items-center gap-3 px-5 py-4">
-              <span className="grid size-10 place-items-center rounded-xl bg-[oklch(0.95_0.08_145)] text-[var(--duo-green-dark)]">{f.icon}</span>
+              <span className="grid size-10 place-items-center rounded-xl bg-[oklch(0.95_0.08_145)] text-[var(--duo-green-dark)]">
+                {f.icon}
+              </span>
               <span className="text-sm font-bold">{f.label}</span>
             </div>
           ))}
