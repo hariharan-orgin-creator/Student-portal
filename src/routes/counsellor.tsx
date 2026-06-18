@@ -631,7 +631,7 @@ function CounsellorPortal() {
       </header>
 
       {/* Main Layout Workspace Grid */}
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[240px_minmax(0,1fr)] md:px-8 w-full min-w-0">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[240px_1fr] md:px-8 w-full min-w-0">
         
         {/* Navigation Sidebar */}
         <aside className="hidden md:block">
@@ -851,7 +851,7 @@ function CounsellorPortal() {
 
           {/* TAB 2: STUDENT RECORDS */}
           {activeTab === "records" && (
-            <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] w-full min-w-0">
+            <div className="grid gap-6 lg:grid-cols-[280px_1fr] w-full min-w-0">
               
               {/* Left Student List Sidebar */}
               <DuoCard className="hidden lg:block p-4 border border-border bg-card">
@@ -945,7 +945,7 @@ function CounsellorPortal() {
                   </div>
 
                   {/* Summary & Risk Metrics Grid */}
-                  <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_240px] pt-4 min-w-0">
+                  <div className="grid gap-6 md:grid-cols-[1fr_240px] pt-4 min-w-0">
                     <div className="space-y-4 min-w-0">
                       <div>
                         <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide mb-1.5">
