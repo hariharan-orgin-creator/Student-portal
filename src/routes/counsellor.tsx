@@ -945,13 +945,13 @@ function CounsellorPortal() {
                   </div>
 
                   {/* Summary & Risk Metrics Grid */}
-                  <div className="grid gap-6 md:grid-cols-[1fr_240px] pt-4">
-                    <div className="space-y-4">
+                  <div className="grid gap-6 md:grid-cols-[1fr_240px] pt-4 min-w-0">
+                    <div className="space-y-4 min-w-0">
                       <div>
                         <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide mb-1.5">
                           Wellness Profile & Psychological Summary
                         </h3>
-                        <p className="text-sm leading-relaxed p-3 bg-muted/30 rounded-xl border border-border font-medium text-foreground">
+                        <p className="text-sm leading-relaxed p-3 bg-muted/30 rounded-xl border border-border font-medium text-foreground break-words whitespace-normal">
                           {selectedStudent.wellnessSummary}
                         </p>
                       </div>
@@ -962,7 +962,7 @@ function CounsellorPortal() {
                           <PlusCircle className="size-4" /> Log Counselling Session
                         </h3>
                         <form onSubmit={handleAddSession} className="space-y-3">
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Session Type</label>
                               <select
@@ -1111,11 +1111,11 @@ function CounsellorPortal() {
                                 </Chip>
                               </div>
                             </div>
-                            <div className="text-xs font-bold text-foreground">{sess.summary}</div>
+                            <div className="text-xs font-bold text-foreground break-words whitespace-normal">{sess.summary}</div>
                             {sess.privateNotes && (
                               <div className="mt-2 text-xs bg-pink-50/30 border-l-2 border-duo-pink pl-2.5 py-1 text-foreground/80 italic font-semibold flex items-start gap-1">
                                 <Lock className="size-3 text-duo-pink shrink-0 mt-0.5" />
-                                <span>Confidential notes: {sess.privateNotes}</span>
+                                <span className="break-words whitespace-normal">Confidential notes: {sess.privateNotes}</span>
                               </div>
                             )}
                           </div>
