@@ -935,10 +935,10 @@ function CounsellorPortal() {
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs font-bold w-full">
-                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 shrink-0">
+                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 break-words whitespace-normal">
                         <span className="text-muted-foreground">Guardian:</span> {selectedStudent.guardian}
                       </div>
-                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 shrink-0">
+                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 break-words whitespace-normal">
                         <span className="text-muted-foreground">Phone:</span> {selectedStudent.guardianContact}
                       </div>
                     </div>
