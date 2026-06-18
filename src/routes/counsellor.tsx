@@ -602,9 +602,9 @@ function CounsellorPortal() {
   );
 
   return (
-    <div className="min-h-screen pb-24 md:pb-10 bg-[oklch(0.99_0.005_95)]">
+    <div className="min-h-screen pb-24 md:pb-10 bg-[oklch(0.99_0.005_95)] overflow-x-hidden w-full">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-20 border-b-2 border-border bg-background/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b-2 border-border bg-background/90 backdrop-blur w-full">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
           <Link to="/" className="flex items-center gap-2 font-display text-2xl font-bold">
             <span className="text-3xl animate-wiggle">🧠</span>
@@ -631,7 +631,7 @@ function CounsellorPortal() {
       </header>
 
       {/* Main Layout Workspace Grid */}
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[240px_1fr] md:px-8">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[240px_1fr] md:px-8 w-full min-w-0">
         
         {/* Navigation Sidebar */}
         <aside className="hidden md:block">
@@ -699,11 +699,11 @@ function CounsellorPortal() {
         </aside>
 
         {/* Dynamic Content Panel */}
-        <main className="space-y-6">
+        <main className="space-y-6 w-full min-w-0">
           
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full min-w-0">
               <div>
                 <h1 className="font-display text-3xl font-extrabold tracking-tight">
                   Mental Wellness Dashboard
@@ -851,7 +851,7 @@ function CounsellorPortal() {
 
           {/* TAB 2: STUDENT RECORDS */}
           {activeTab === "records" && (
-            <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+            <div className="grid gap-6 lg:grid-cols-[280px_1fr] w-full min-w-0">
               
               {/* Left Student List Sidebar */}
               <DuoCard className="hidden lg:block p-4 border border-border bg-card">
@@ -897,7 +897,7 @@ function CounsellorPortal() {
               </DuoCard>
 
               {/* Right Student Details Panel */}
-              <div className="space-y-6">
+              <div className="space-y-6 w-full min-w-0">
                 {/* Mobile Student Selector (Visible only below lg size) */}
                 <DuoCard className="block lg:hidden p-4 border border-border bg-card">
                   <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-2">
@@ -934,11 +934,11 @@ function CounsellorPortal() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs font-bold">
-                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs font-bold w-full">
+                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 shrink-0">
                         <span className="text-muted-foreground">Guardian:</span> {selectedStudent.guardian}
                       </div>
-                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5">
+                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 shrink-0">
                         <span className="text-muted-foreground">Phone:</span> {selectedStudent.guardianContact}
                       </div>
                     </div>
@@ -1132,7 +1132,7 @@ function CounsellorPortal() {
 
           {/* TAB 3: CASE MANAGEMENT */}
           {activeTab === "cases" && (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full min-w-0">
               <div className="flex justify-between items-center">
                 <div>
                   <h1 className="font-display text-2xl font-extrabold">Confidential Case Files</h1>
@@ -1231,7 +1231,7 @@ function CounsellorPortal() {
 
           {/* TAB 4: APPOINTMENT SCHEDULING */}
           {activeTab === "appointments" && (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full min-w-0">
               <div className="flex justify-between items-center">
                 <div>
                   <h1 className="font-display text-2xl font-extrabold">Appointment Scheduling</h1>
@@ -1323,7 +1323,7 @@ function CounsellorPortal() {
 
           {/* TAB 5: RISK & BEHAVIOUR TRACKING */}
           {activeTab === "risk" && (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full min-w-0">
               <div>
                 <h1 className="font-display text-2xl font-extrabold flex items-center gap-2">
                   <ShieldAlert className="size-6 text-duo-red animate-pulse" /> Wellness Risk Indicators
@@ -1461,7 +1461,7 @@ function CounsellorPortal() {
 
           {/* TAB 6: CONFIDENTIAL REPORTS */}
           {activeTab === "reports" && (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full min-w-0">
               <div className="flex justify-between items-center">
                 <div>
                   <h1 className="font-display text-2xl font-extrabold">Confidential Reports Inbox</h1>
@@ -1561,7 +1561,7 @@ function CounsellorPortal() {
 
           {/* TAB 7: DISCIPLINE MODULE INTEGRATION */}
           {activeTab === "discipline" && (
-            <div className="space-y-6">
+            <div className="space-y-6 w-full min-w-0">
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="font-display text-2xl font-extrabold flex items-center gap-2">
