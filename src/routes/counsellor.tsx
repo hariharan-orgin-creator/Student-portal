@@ -1026,7 +1026,7 @@ function CounsellorPortal() {
                     </div>
 
                     {/* Right Side: Active Case Status & Indicators */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0 w-full">
                       {/* Active Case Info */}
                       {(() => {
                         const activeCase = cases.find((c) => c.studentId === selectedStudent.id && c.status !== "Resolved");

@@ -84,9 +84,9 @@ export function DuoProgress({
   return (
     <div className="space-y-1">
       {label && (
-        <div className="flex justify-between text-xs font-bold text-muted-foreground">
-          <span>{label}</span>
-          <span className="font-numeric">{value}%</span>
+        <div className="flex flex-wrap items-center justify-between gap-1 text-xs font-bold text-muted-foreground">
+          <span className="break-words whitespace-normal">{label}</span>
+          <span className="font-numeric shrink-0">{value}%</span>
         </div>
       )}
       <div className="progress-track">
