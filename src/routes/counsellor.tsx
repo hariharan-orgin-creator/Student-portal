@@ -611,7 +611,7 @@ function CounsellorPortal() {
             <span className="bg-gradient-to-r from-duo-pink to-duo-purple bg-clip-text text-transparent">
               SkoolDojo
             </span>
-            <span className="text-xs font-bold text-muted-foreground uppercase border border-border bg-card px-2 py-0.5 rounded-full">
+            <span className="hidden sm:inline-block text-xs font-bold text-muted-foreground uppercase border border-border bg-card px-2 py-0.5 rounded-full">
               Well-being Portal
             </span>
           </Link>
@@ -854,7 +854,7 @@ function CounsellorPortal() {
             <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
               
               {/* Left Student List Sidebar */}
-              <DuoCard className="p-4 border border-border bg-card">
+              <DuoCard className="hidden lg:block p-4 border border-border bg-card">
                 <div className="relative mb-3">
                   <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
                   <input
@@ -898,6 +898,29 @@ function CounsellorPortal() {
 
               {/* Right Student Details Panel */}
               <div className="space-y-6">
+                {/* Mobile Student Selector (Visible only below lg size) */}
+                <DuoCard className="block lg:hidden p-4 border border-border bg-card">
+                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-2">
+                    Select Student
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedStudentId}
+                      onChange={(e) => setSelectedStudentId(e.target.value)}
+                      className="w-full text-xs font-bold bg-muted/40 border border-border rounded-xl p-3 pr-10 appearance-none focus:ring-2 focus:ring-duo-pink focus:outline-none"
+                    >
+                      {students.map((stud) => (
+                        <option key={stud.id} value={stud.id}>
+                          {stud.avatar} {stud.name} ({stud.overall})
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+                      <ChevronRight className="size-4 rotate-90" />
+                    </div>
+                  </div>
+                </DuoCard>
+
                 <DuoCard className="p-5 border border-border bg-card">
                   
                   {/* Student Header */}
@@ -1942,20 +1965,36 @@ function CounsellorPortal() {
       )}
 
       {/* Navigation bottom bar for Mobile view */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 grid grid-cols-7 border-t-2 border-border bg-card md:hidden overflow-x-auto">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 flex items-center overflow-x-auto border-t-2 border-border bg-card md:hidden px-2 py-1 gap-1 shadow-lg scrollbar-none">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          let hasBadge = false;
+          let badgeValue = "";
+
+          if (item.id === "reports" && newReportsCount > 0) {
+            hasBadge = true;
+            badgeValue = `${newReportsCount}`;
+          } else if (item.id === "discipline" && disciplineIncidents.filter(i => i.disciplineStatus === "Pending Review").length > 0) {
+            hasBadge = true;
+            badgeValue = "!";
+          }
+
           return (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-0.5 py-2 px-1 text-[10px] font-bold min-w-[60px] ${
-                isActive ? "text-duo-pink bg-pink-50/10" : "text-muted-foreground"
+              className={`relative flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-xl text-[10px] font-bold flex-1 min-w-[64px] shrink-0 transition ${
+                isActive ? "text-duo-pink bg-pink-50/40" : "text-muted-foreground hover:bg-muted/30"
               }`}
             >
               <Icon className="size-4" />
               <span className="truncate w-full text-center">{item.label}</span>
+              {hasBadge && (
+                <span className="absolute top-1.5 right-1.5 rounded-full bg-duo-pink size-3.5 flex items-center justify-center text-[8px] font-extrabold text-white">
+                  {badgeValue}
+                </span>
+              )}
             </button>
           );
         })}
