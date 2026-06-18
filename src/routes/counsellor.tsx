@@ -1280,7 +1280,7 @@ function CounsellorPortal() {
                               </Chip>
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <div className="inline-flex gap-1 justify-center">
+                              <div className="flex flex-col sm:flex-row gap-1 justify-center items-center">
                                 {apt.status === "Pending" && (
                                   <button
                                     onClick={() => handleToggleAptStatus(apt.id, "Confirmed")}
@@ -1815,7 +1815,7 @@ function CounsellorPortal() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Date</label>
                   <input
