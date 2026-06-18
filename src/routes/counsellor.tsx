@@ -921,7 +921,7 @@ function CounsellorPortal() {
                   </div>
                 </DuoCard>
 
-                <DuoCard className="p-5 border border-border bg-card">
+                <DuoCard className="p-4 sm:p-5 border border-border bg-card">
                   
                   {/* Student Header */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-border gap-4">
@@ -1097,8 +1097,8 @@ function CounsellorPortal() {
                       ) : (
                         selectedStudent.sessions.map((sess: any) => (
                           <div key={sess.id} className="rounded-xl border border-border p-3.5 bg-card">
-                            <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-muted">
-                              <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 pb-1.5 border-b border-muted">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <span className="rounded-md bg-pink-100 text-duo-pink px-2 py-0.5 text-[10px] font-extrabold uppercase">
                                   {sess.type}
                                 </span>
