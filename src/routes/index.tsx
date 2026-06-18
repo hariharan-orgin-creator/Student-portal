@@ -46,6 +46,14 @@ const roles = [
     variant: "blue" as const,
     bg: "from-[oklch(0.95_0.08_240)] to-[oklch(0.9_0.1_240)]",
   },
+  {
+    to: "/counsellor" as const,
+    title: "I'm a Counsellor",
+    desc: "Support student well-being & case logs.",
+    icon: "🧠",
+    variant: "pink" as const,
+    bg: "from-[oklch(0.95_0.06_350)] to-[oklch(0.9_0.08_350)]",
+  },
 ];
 
 function Landing() {
@@ -67,7 +75,7 @@ function Landing() {
           </p>
         </header>
 
-        <section aria-label="Choose your role" className="grid gap-6 md:grid-cols-3">
+        <section aria-label="Choose your role" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {roles.map((r) => (
             <Link
               key={r.to}
