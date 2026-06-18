@@ -928,7 +928,7 @@ function CounsellorPortal() {
                     <div className="flex items-center gap-3">
                       <span className="text-5xl p-2 rounded-3xl bg-muted/80">{selectedStudent.avatar}</span>
                       <div>
-                        <h2 className="font-display text-2xl font-black">{selectedStudent.name}</h2>
+                        <h2 className="font-display text-2xl font-black break-words whitespace-normal">{selectedStudent.name}</h2>
                         <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                           Class: {selectedStudent.overall} ({selectedStudent.grade})
                         </p>
