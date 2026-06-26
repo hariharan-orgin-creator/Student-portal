@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { DuoButton, DuoCard, Chip, DuoProgress } from "@/components/duo";
+import { DuoButton, DuoCard, Chip } from "@/components/duo";
 import { STUDENTS_IN_CLASS } from "@/lib/mockData";
 import {
   Home,
@@ -10,23 +10,32 @@ import {
   ShieldAlert,
   Inbox,
   AlertOctagon,
-  Search,
-  Plus,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Lock,
   ChevronRight,
-  Filter,
-  PlusCircle,
-  Send,
-  UserPlus,
   BookmarkCheck,
-  Activity,
-  Heart,
-  ExternalLink,
+  Lock,
 } from "lucide-react";
+
+// Modular tab components
+import { DashboardTab } from "@/components/counsellor/dashboard/DashboardTab";
+import { StudentRecordsTab } from "@/components/counsellor/records/StudentRecordsTab";
+import { CaseManagerTab } from "@/components/counsellor/cases/CaseManagerTab";
+import { AppointmentsTab } from "@/components/counsellor/appointments/AppointmentsTab";
+import { RiskTrackingTab } from "@/components/counsellor/risk/RiskTrackingTab";
+import { PendingActionsTab } from "@/components/counsellor/pending/PendingActionsTab";
+import { InboxReportsTab } from "@/components/counsellor/reports/InboxReportsTab";
+import { DisciplineSyncTab } from "@/components/counsellor/discipline/DisciplineSyncTab";
+
+// Modals
+import { NewCaseModal } from "@/components/counsellor/modals/NewCaseModal";
+import { EditCaseModal } from "@/components/counsellor/modals/EditCaseModal";
+import { ScheduleSessionModal } from "@/components/counsellor/modals/ScheduleSessionModal";
+import { CloseCaseModal } from "@/components/counsellor/modals/CloseCaseModal";
+import { ViewAptModal } from "@/components/counsellor/modals/ViewAptModal";
+import { NewReportModal } from "@/components/counsellor/modals/NewReportModal";
+import { DismissReportModal } from "@/components/counsellor/modals/DismissReportModal";
+import { ReviewIncidentModal } from "@/components/counsellor/modals/ReviewIncidentModal";
+import { ViewReportModal } from "@/components/counsellor/modals/ViewReportModal";
+
 
 export const Route = createFileRoute("/counsellor")({
   head: () => ({
@@ -46,67 +55,224 @@ const DEFAULT_STUDENTS_PROFILE = STUDENTS_IN_CLASS.map((student) => {
   const isAisyah = student.name.includes("Aisha") || student.name.includes("Aisyah");
   const isDanish = student.name.includes("Danish");
   const isAli = student.name.includes("Ali");
-  
+  const isSara = student.name.includes("Sara");
+
+  let caseId = "CASE-105";
+  let riskLevel = "Low";
+  let tags = ["Career"];
+  let lastActivityDate = "2026-06-14";
   let wellnessSummary = "Student appears well-adjusted. High participation in class and active socially.";
-  let sessions: {
-    id: string;
-    date: string;
-    type: "Individual" | "Group" | "Parent Consultation" | "Teacher Consultation";
-    progress: number;
-    summary: string;
-    privateNotes: string;
-  }[] = [
-    {
-      id: "s-1",
-      date: "2026-06-02",
-      type: "Individual",
-      progress: 4,
-      summary: "Routine check-in. Aisha is excited about school and discussed minor exam anxieties.",
-      privateNotes: "High achievement orientation. Monitor self-imposed pressure.",
-    }
+
+  let academic = { overallGrade: "A", examRank: "1st in Class", atRiskSubjects: [] as string[] };
+  let attendance = { monthlyPercent: 96, termAverage: 95, absentDays: 1 };
+  let sessionHistory = { totalSessions: 0, lastSessionDate: "None", nextScheduled: "None" };
+  let behaviour = { incidentCount: 0, openDisciplineReferrals: 0 };
+  let support = { parentName: "Mr. Nair", classTeacher: "Cikgu Nadia", hod: "Mr. Albert", lastParentMessageDate: "2026-06-10" };
+  let pendingTasks: any[] = [
+    { id: "t6", text: "Provide scholarship information brochures", urgency: "pending", dueDate: "2026-06-28" }
   ];
-  
-  if (isDanish) {
+
+  let sessionsLog = [] as any[];
+  let interventions: any[] = [
+    { id: "i5", type: "Career Guidance", startDate: "2026-06-14", endDate: "", status: "Active", assignedPerson: "Puan Maryam", outcomeNotes: "Discussing school options next term." }
+  ];
+  let referrals: any[] = [
+    { id: "r5", whoReferred: "Self", reason: "Discuss secondary school selection and career paths in STEM.", dateSubmitted: "2026-06-13", urgency: "Low", status: "Open", notes: "Interest in technology and engineering." }
+  ];
+  let goals: any[] = [
+    { id: "g5", title: "Research top 3 secondary schools", category: "Career", targetDate: "2026-07-15", status: "Not Started", linkedItems: "Self Referral" }
+  ];
+  let documents: any[] = [
+    { id: "d5", name: "Career_Interest_Inventory.pdf", uploadDate: "2026-06-14", uploadedBy: "Zara Nair", accessLevel: "Shared" }
+  ];
+
+  if (isAisyah) {
+    caseId = "CASE-103";
+    riskLevel = "Low";
+    tags = ["Academic", "Referral"];
+    lastActivityDate = "2026-06-16";
+    wellnessSummary = "Routine check-in. Aisha is excited about school and discussed minor exam anxieties.";
+    academic = { overallGrade: "A", examRank: "3rd in Class", atRiskSubjects: [] };
+    attendance = { monthlyPercent: 95, termAverage: 96, absentDays: 1 };
+    sessionHistory = { totalSessions: 1, lastSessionDate: "2026-06-02", nextScheduled: "2026-06-17" };
+    behaviour = { incidentCount: 0, openDisciplineReferrals: 0 };
+    support = { parentName: "Encik Rahman", classTeacher: "Cikgu Nadia", hod: "Mr. Albert", lastParentMessageDate: "2026-06-15" };
+    pendingTasks = [
+      { id: "t1", text: "Routine check-in on homework progress", urgency: "pending" as const, dueDate: "2026-06-25" }
+    ];
+    sessionsLog = [
+      {
+        id: "s-1",
+        date: "2026-06-02",
+        type: "Individual",
+        duration: "30 mins",
+        counselorName: "Puan Maryam",
+        notes: "Routine check-in. Aisha is excited about school and discussed minor exam anxieties.",
+        outcome: "Coping strategies discussed",
+        followUpTasks: ["Check homework next week"]
+      }
+    ];
+    interventions = [
+      { id: "i6", type: "Academic Support" as const, startDate: "2026-05-10", endDate: "2026-06-01", status: "Completed" as const, assignedPerson: "Cikgu Nadia", outcomeNotes: "Aisha improved her mathematics mock grades." }
+    ];
+    referrals = [
+      { id: "r1", whoReferred: "Teacher" as const, reason: "Slight nervousness during math examinations.", dateSubmitted: "2026-06-01", urgency: "Low" as const, status: "Closed" as const, notes: "Counselling requested, initial meeting done." }
+    ];
+    goals = [
+      { id: "g1", title: "Manage test anxiety", category: "Academic" as const, targetDate: "2026-07-01", status: "In Progress" as const, linkedItems: "Session 2026-06-02" }
+    ];
+    documents = [
+      { id: "d1", name: "Parental_Consent_Form.pdf", uploadDate: "2026-06-01", uploadedBy: "Encik Rahman", accessLevel: "Shared" as const }
+    ];
+  } else if (isDanish) {
+    caseId = "CASE-101";
+    riskLevel = "High";
+    tags = ["Attendance", "Academic", "Behaviour", "Referral"];
+    lastActivityDate = "2026-06-18";
     wellnessSummary = "Danish has shown significant academic decline and emotional withdrawal recently. Requires active support.";
-    sessions = [
+    academic = { overallGrade: "C+", examRank: "18th in Class", atRiskSubjects: ["Science", "Mathematics"] };
+    attendance = { monthlyPercent: 78, termAverage: 82, absentDays: 8 };
+    sessionHistory = { totalSessions: 2, lastSessionDate: "2026-06-15", nextScheduled: "2026-06-17" };
+    behaviour = { incidentCount: 2, openDisciplineReferrals: 1 };
+    support = { parentName: "Mr. Kumar", classTeacher: "Cikgu Nadia", hod: "Mr. Albert", lastParentMessageDate: "2026-06-16" };
+    pendingTasks = [
+      { id: "t4", text: "Contact parent for review meeting", urgency: "overdue" as const, dueDate: "2026-06-19" },
+      { id: "t5", text: "Science teacher feedback check", urgency: "due_soon" as const, dueDate: "2026-06-24" }
+    ];
+    sessionsLog = [
       {
         id: "s-2",
         date: "2026-06-08",
-        type: "Individual" as const,
-        progress: 2,
-        summary: "Danish shared that he feels overwhelmed by classroom expectations and is struggling to focus.",
-        privateNotes: "Lack of sleep reported. Seems reluctant to talk about home situation. Need to involve parents.",
+        type: "Individual",
+        duration: "45 mins",
+        counselorName: "Puan Maryam",
+        notes: "Danish shared that he feels overwhelmed by classroom expectations and is struggling to focus.",
+        outcome: "Coping strategies discussed",
+        followUpTasks: []
       },
       {
         id: "s-3",
         date: "2026-06-15",
-        type: "Individual" as const,
-        progress: 3,
-        summary: "Follow-up session. Discussed study techniques and emotional regulation. Danish was slightly more communicative.",
-        privateNotes: "Progressing slowly. Still defensive but responsive to relaxation techniques.",
+        type: "Individual",
+        duration: "50 mins",
+        counselorName: "Puan Maryam",
+        notes: "Follow-up session. Discussed study techniques and emotional regulation. Danish was slightly more communicative.",
+        outcome: "Relaxation techniques practiced",
+        followUpTasks: ["Review sleep diary"]
       }
     ];
+    interventions = [
+      { id: "i3", type: "Academic Support" as const, startDate: "2026-06-09", endDate: "", status: "Active" as const, assignedPerson: "Cikgu Nadia", outcomeNotes: "Danish is being monitored for missed homework." }
+    ];
+    referrals = [
+      { id: "r4", whoReferred: "Teacher" as const, reason: "Caught cheating during test and skipping mathematics class.", dateSubmitted: "2026-06-08", urgency: "High" as const, status: "In Progress" as const, notes: "Assigned active case." }
+    ];
+    goals = [
+      { id: "g4", title: "Complete all science homework", category: "Academic" as const, targetDate: "2026-06-30", status: "In Progress" as const, linkedItems: "Intervention 2026-06-09" }
+    ];
+    documents = [
+      { id: "d4", name: "Science_Test_Incident.pdf", uploadDate: "2026-06-08", uploadedBy: "Cikgu Nadia", accessLevel: "Confidential" as const }
+    ];
   } else if (isAli) {
+    caseId = "CASE-102";
+    riskLevel = "Medium";
+    tags = ["Behaviour", "Referral"];
+    lastActivityDate = "2026-06-12";
     wellnessSummary = "Ali is energetic and friendly, but sometimes struggles with impulse control in classroom group settings.";
-    sessions = [
+    academic = { overallGrade: "B+", examRank: "12th in Class", atRiskSubjects: [] };
+    attendance = { monthlyPercent: 88, termAverage: 90, absentDays: 4 };
+    sessionHistory = { totalSessions: 1, lastSessionDate: "2026-06-10", nextScheduled: "2026-06-18" };
+    behaviour = { incidentCount: 1, openDisciplineReferrals: 1 };
+    support = { parentName: "Puan Zarina", classTeacher: "Cikgu Nadia", hod: "Mr. Albert", lastParentMessageDate: "2026-06-12" };
+    pendingTasks = [
+      { id: "t2", text: "Speak to art teacher regarding classroom interactions", urgency: "due_soon" as const, dueDate: "2026-06-23" }
+    ];
+    sessionsLog = [
       {
         id: "s-4",
         date: "2026-06-10",
-        type: "Teacher Consultation" as const,
-        progress: 3,
-        summary: "Met with Cikgu Nadia to discuss Ali's behavior. Devised a positive reinforcement seat plan.",
-        privateNotes: "Nadia reported good cooperation. Ali responds well to immediate visual rewards.",
+        type: "Teacher Consultation",
+        duration: "45 mins",
+        counselorName: "Puan Maryam",
+        notes: "Met with Cikgu Nadia to discuss Ali's behavior. Devised a positive reinforcement seat plan.",
+        outcome: "Visual rewards contract established",
+        followUpTasks: ["Ask teacher for weekly update"]
       }
+    ];
+    interventions = [
+      { id: "i1", type: "Behaviour Plan" as const, startDate: "2026-06-11", endDate: "", status: "Active" as const, assignedPerson: "Cikgu Nadia", outcomeNotes: "Ali has responded well to immediate visual rewards." }
+    ];
+    referrals = [
+      { id: "r2", whoReferred: "Teacher" as const, reason: "Verbal disputes in Art class.", dateSubmitted: "2026-06-09", urgency: "Medium" as const, status: "In Progress" as const, notes: "Under observation." }
+    ];
+    goals = [
+      { id: "g2", title: "Improve impulse control", category: "Behavioural" as const, targetDate: "2026-06-30", status: "In Progress" as const, linkedItems: "Behaviour Plan" }
+    ];
+    documents = [
+      { id: "d2", name: "Art_Class_Incident_Report.pdf", uploadDate: "2026-06-10", uploadedBy: "Cikgu Nadia", accessLevel: "Confidential" as const }
+    ];
+  } else if (isSara) {
+    caseId = "CASE-104";
+    riskLevel = "Medium";
+    tags = ["Emotional", "Academic"];
+    lastActivityDate = "2026-06-15";
+    wellnessSummary = "Sara is showing signs of anxiety before her upcoming math exam. She complains of stomach aches in the morning.";
+    academic = { overallGrade: "A-", examRank: "6th in Class", atRiskSubjects: ["Mathematics"] };
+    attendance = { monthlyPercent: 92, termAverage: 93, absentDays: 2 };
+    sessionHistory = { totalSessions: 1, lastSessionDate: "2026-06-14", nextScheduled: "2026-06-20" };
+    behaviour = { incidentCount: 0, openDisciplineReferrals: 0 };
+    support = { parentName: "Mrs. Lim", classTeacher: "Cikgu Nadia", hod: "Mr. Albert", lastParentMessageDate: "2026-06-14" };
+    pendingTasks = [
+      { id: "t3", text: "Send home relaxation exercises", urgency: "overdue" as const, dueDate: "2026-06-20" }
+    ];
+    sessionsLog = [
+      {
+        id: "s-5",
+        date: "2026-06-14",
+        type: "Individual",
+        duration: "40 mins",
+        counselorName: "Puan Maryam",
+        notes: "Sara expressed extreme worry about math formulas and felt physical tension during mock tests.",
+        outcome: "Breathing techniques introduced",
+        followUpTasks: ["Review anxiety exercises"]
+      }
+    ];
+    interventions = [
+      { id: "i2", type: "Emotional Support" as const, startDate: "2026-06-14", endDate: "", status: "Active" as const, assignedPerson: "Puan Maryam", outcomeNotes: "Weekly wellness checkups." }
+    ];
+    referrals = [
+      { id: "r3", whoReferred: "Parent" as const, reason: "Sara is showing signs of anxiety and morning stomach aches before exams.", dateSubmitted: "2026-06-14", urgency: "Medium" as const, status: "Open" as const, notes: "Referral received from parent." }
+    ];
+    goals = [
+      { id: "g3", title: "Reduce test-related physical symptoms", category: "Emotional" as const, targetDate: "2026-07-10", status: "In Progress" as const, linkedItems: "Session 2026-06-14" }
+    ];
+    documents = [
+      { id: "d3", name: "Anxiety_Self_Assessment.pdf", uploadDate: "2026-06-14", uploadedBy: "Puan Maryam", accessLevel: "Confidential" as const }
     ];
   }
 
   return {
     ...student,
     age: 11,
-    guardian: isAisyah ? "Encik Rahman" : isDanish ? "Mr. Kumar" : isAli ? "Puan Zarina" : "Mr. Lim",
-    guardianContact: "+60 12-345-67" + (isAisyah ? "89" : isDanish ? "54" : "12"),
+    guardian: isAisyah ? "Encik Rahman" : isDanish ? "Mr. Kumar" : isAli ? "Puan Zarina" : isSara ? "Mrs. Lim" : "Mr. Nair",
+    guardianContact: "+60 12-345-67" + (isAisyah ? "89" : isDanish ? "54" : isAli ? "12" : isSara ? "34" : "56"),
     wellnessSummary,
-    sessions,
+    caseId,
+    riskLevel,
+    tags,
+    lastActivityDate,
+    academic,
+    attendance,
+    sessionHistory,
+    behaviour,
+    support,
+    pendingTasks,
+    sessionsLog,
+    interventions,
+    referrals,
+    goals,
+    documents,
+    sessions: sessionsLog
   };
 });
 
@@ -116,24 +282,80 @@ const DEFAULT_CASES = [
     studentId: "s4",
     studentName: "Danish Kumar",
     avatar: "👦🏾",
-    category: "Academic Stress",
+    category: "Academic",
     riskLevel: "High" as const,
-    status: "Active" as const,
+    status: "In Progress" as const,
     openDate: "2026-06-08",
     lastSessionDate: "2026-06-15",
-    summary: "Managing general academic burnout and classroom isolation. Collaborative wellness plan initiated.",
+    summary: "Managing general academic burnout and classroom isolation.",
+    assignedCounselor: "Puan Maryam",
+    notes: "Danish has shown academic decline and classroom withdrawal, support plan initiated.",
+    closedDate: "",
+    closedBy: "",
   },
   {
     id: "CASE-102",
     studentId: "s2",
     studentName: "Ali Hassan",
     avatar: "👦🏽",
-    category: "Behavioral",
+    category: "Behaviour",
     riskLevel: "Medium" as const,
-    status: "Observation" as const,
+    status: "Open" as const,
     openDate: "2026-06-10",
     lastSessionDate: "2026-06-10",
-    summary: "Impulse control check-in, tracking social integrations in primary classes.",
+    summary: "Impulse control check-in in art and primary group classroom settings.",
+    assignedCounselor: "Puan Maryam",
+    notes: "Ali responds moderately well to immediate reward charts.",
+    closedDate: "",
+    closedBy: "",
+  },
+  {
+    id: "CASE-103",
+    studentId: "s1",
+    studentName: "Aisyah Rahman",
+    avatar: "👧🏻",
+    category: "Academic",
+    riskLevel: "Low" as const,
+    status: "Closed" as const,
+    openDate: "2026-06-02",
+    lastSessionDate: "2026-06-02",
+    summary: "Anxiety support during examination period.",
+    assignedCounselor: "Puan Maryam",
+    notes: "Aisha successfully learned coping techniques for Math test stress.",
+    closedDate: "2026-06-15",
+    closedBy: "Puan Maryam",
+  },
+  {
+    id: "CASE-104",
+    studentId: "s3",
+    studentName: "Sara Lim",
+    avatar: "👧🏼",
+    category: "Emotional",
+    riskLevel: "Medium" as const,
+    status: "In Progress" as const,
+    openDate: "2026-06-14",
+    lastSessionDate: "2026-06-14",
+    summary: "Anxiety support due to morning stomach aches.",
+    assignedCounselor: "Puan Maryam",
+    notes: "Sara completed self assessments, counselor routine checkups scheduled.",
+    closedDate: "",
+    closedBy: "",
+  },
+  {
+    id: "CASE-105",
+    studentId: "s5",
+    studentName: "Zara Nair",
+    avatar: "👧🏽",
+    category: "Career",
+    riskLevel: "Low" as const,
+    status: "Open" as const,
+    openDate: "2026-06-14",
+    lastSessionDate: "2026-06-14",
+    summary: "Secondary STEM selection options review.",
+    assignedCounselor: "Puan Maryam",
+    notes: "Completed interest inventory.",
+    closedDate: "",
+    closedBy: "",
   }
 ];
 
@@ -143,30 +365,90 @@ const DEFAULT_APPOINTMENTS = [
     studentId: "s4",
     studentName: "Danish Kumar",
     avatar: "👦🏾",
-    date: "2026-06-17",
-    time: "10:00 AM",
+    caseId: "CASE-101",
+    date: "2026-06-22",
+    time: "09:00",
+    duration: "45 mins",
+    counselorName: "Puan Maryam",
     type: "Individual" as const,
     status: "Confirmed" as const,
+    notes: "Discuss math test cheating incident and academic pressure.",
+    reminder: "15m" as const,
   },
   {
     id: "apt-2",
     studentId: "s1",
-    studentName: "Aisha Rahman",
+    studentName: "Aisyah Rahman",
     avatar: "👧🏻",
-    date: "2026-06-17",
-    time: "11:30 AM",
-    type: "Individual" as const,
-    status: "Pending" as const,
+    caseId: "CASE-103",
+    date: "2026-06-22",
+    time: "11:30",
+    duration: "30 mins",
+    counselorName: "Puan Maryam",
+    type: "Follow-up" as const,
+    status: "Confirmed" as const,
+    notes: "Check-in on homework progress and exam coping techniques.",
+    reminder: "1h" as const,
   },
   {
     id: "apt-3",
     studentId: "s2",
     studentName: "Ali Hassan",
     avatar: "👦🏽",
-    date: "2026-06-18",
-    time: "02:00 PM",
-    type: "Parent Consultation" as const,
+    caseId: "CASE-102",
+    date: "2026-06-23",
+    time: "14:00",
+    duration: "60 mins",
+    counselorName: "Mr. Albert",
+    type: "Group" as const,
+    status: "Pending" as const,
+    notes: "Social skills group therapy session.",
+    reminder: "1d" as const,
+  },
+  {
+    id: "apt-4",
+    studentId: "s3",
+    studentName: "Sara Lim",
+    avatar: "👧🏼",
+    caseId: "CASE-104",
+    date: "2026-06-22",
+    time: "15:30",
+    duration: "45 mins",
+    counselorName: "Puan Maryam",
+    type: "Emergency" as const,
     status: "Confirmed" as const,
+    notes: "Acute exam anxiety report. High distress.",
+    reminder: "none" as const,
+  },
+  {
+    id: "apt-5",
+    studentId: "s5",
+    studentName: "Zara Nair",
+    avatar: "👧🏽",
+    caseId: "CASE-105",
+    date: "2026-06-24",
+    time: "10:00",
+    duration: "45 mins",
+    counselorName: "Puan Maryam",
+    type: "Follow-up" as const,
+    status: "Cancelled" as const,
+    notes: "Review STEM career inventory outcomes.",
+    reminder: "none" as const,
+  },
+  {
+    id: "apt-6",
+    studentId: "s4",
+    studentName: "Danish Kumar",
+    avatar: "👦🏾",
+    caseId: "CASE-101",
+    date: "2026-06-25",
+    time: "13:00",
+    duration: "30 mins",
+    counselorName: "Puan Maryam",
+    type: "Individual" as const,
+    status: "Pending" as const,
+    notes: "Follow up on parent communication response.",
+    reminder: "15m" as const,
   }
 ];
 
@@ -216,43 +498,94 @@ const DEFAULT_REPORTS = [
 
 const DEFAULT_DISCIPLINE_INCIDENTS = [
   {
-    id: "disc-301",
+    id: "INC-301",
     studentId: "s4",
     studentName: "Danish Kumar",
     avatar: "👦🏾",
-    infraction: "Caught cheating during the Science Unit Test on plant cells.",
+    grade: "Grade 5",
     date: "2026-06-08",
+    description: "Caught cheating during the Science Unit Test on plant cells.",
+    type: "Academic misconduct",
+    status: "Linked" as const,
     loggedBy: "Cikgu Nadia",
-    disciplineStatus: "Referred to Counselling" as const,
-    counsellingReferral: true,
+    reporterRole: "Teacher",
+    adminAction: "warning",
     counsellingCaseId: "CASE-101",
-    interventionNotes: "Initiated active case. Danish's academic pressure appears to be driving this behavior.",
   },
   {
-    id: "disc-302",
+    id: "INC-302",
     studentId: "s2",
     studentName: "Ali Hassan",
     avatar: "👦🏽",
-    infraction: "Frequent disruptions and yelling in the Art class, refusing to follow instructions.",
+    grade: "Grade 6",
     date: "2026-06-12",
+    description: "Frequent disruptions and yelling in the Art class, refusing to follow instructions and throwing pencil cases.",
+    type: "Verbal altercation",
+    status: "Linked" as const,
     loggedBy: "Cikgu Nadia",
-    disciplineStatus: "Action Taken" as const,
-    counsellingReferral: true,
+    reporterRole: "Teacher",
+    adminAction: "parent notification",
     counsellingCaseId: "CASE-102",
-    interventionNotes: "Recommended visual focus board and seat modification. Ali responded positively.",
   },
   {
-    id: "disc-303",
+    id: "INC-303",
     studentId: "s4",
     studentName: "Danish Kumar",
     avatar: "👦🏾",
-    infraction: "Unexcused absence and cutting classes (Mathematics) twice in one week.",
+    grade: "Grade 5",
     date: "2026-06-15",
+    description: "Unexcused absence and cutting classes (Mathematics) twice in one week without valid reasons.",
+    type: "Truancy",
+    status: "New" as const,
     loggedBy: "Cikgu Nadia",
-    disciplineStatus: "Pending Review" as const,
-    counsellingReferral: true,
+    reporterRole: "Teacher",
+    adminAction: "warning",
     counsellingCaseId: null,
-    interventionNotes: "",
+  },
+  {
+    id: "INC-304",
+    studentId: "s3",
+    studentName: "Sara Lim",
+    avatar: "👧🏼",
+    grade: "Grade 5",
+    date: "2026-06-20",
+    description: "Crying uncontrollably before math class, complaining of extreme panic and exam anxiety.",
+    type: "Emotional",
+    status: "New" as const,
+    loggedBy: "Cikgu Nadia",
+    reporterRole: "Teacher",
+    adminAction: "parent notification",
+    counsellingCaseId: null,
+  },
+  {
+    id: "INC-305",
+    studentId: "s4",
+    studentName: "Danish Kumar",
+    avatar: "👦🏾",
+    grade: "Grade 5",
+    date: "2026-06-22",
+    description: "Got into a physical altercation with another student during recess over a football dispute.",
+    type: "Aggression",
+    status: "New" as const,
+    loggedBy: "Mr. Albert",
+    reporterRole: "Teacher",
+    adminAction: "suspension",
+    counsellingCaseId: null,
+  },
+  {
+    id: "INC-306",
+    studentId: "s1",
+    studentName: "Aisyah Rahman",
+    avatar: "👧🏻",
+    grade: "Grade 6",
+    date: "2026-06-24",
+    description: "Minor copying of homework answers from classmate. Student apologized and showed remorse.",
+    type: "Academic misconduct",
+    status: "Reviewed" as const,
+    loggedBy: "Cikgu Nadia",
+    reporterRole: "Teacher",
+    adminAction: "warning",
+    counsellingCaseId: null,
   }
 ];
 
@@ -262,12 +595,16 @@ const NAV_ITEMS = [
   { id: "cases", label: "Case Manager", icon: FolderHeart },
   { id: "appointments", label: "Appointments", icon: Calendar },
   { id: "risk", label: "Risk Tracking", icon: ShieldAlert },
+  { id: "pending_actions", label: "Pending Actions", icon: BookmarkCheck },
   { id: "reports", label: "Inbox Reports", icon: Inbox, badge: "New" },
   { id: "discipline", label: "Discipline Sync", icon: AlertOctagon },
 ];
 
 function CounsellorPortal() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [taskFilter, setTaskFilter] = useState("All");
+  const [taskSearchQuery, setTaskSearchQuery] = useState("");
+  const todayDateStr = "2026-06-25";
 
   // Core Module States
   const [students, setStudents] = useState<any[]>([]);
@@ -280,12 +617,203 @@ function CounsellorPortal() {
   // Selection & UI States
   const [selectedStudentId, setSelectedStudentId] = useState<string>("s4");
   const [searchQuery, setSearchQuery] = useState("");
+  const [reportSearchQuery, setReportSearchQuery] = useState("");
+  const [reportToDismiss, setReportToDismiss] = useState<any | null>(null);
+  const [reportToView, setReportToView] = useState<any | null>(null);
+  const [newReportStudentSearch, setNewReportStudentSearch] = useState("");
+  const [newReportShowDropdown, setNewReportShowDropdown] = useState(false);
+  // Discipline Sync UI and filtering states
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
+  const [disciplineSearchQuery, setDisciplineSearchQuery] = useState("");
+  const [disciplineStatusFilter, setDisciplineStatusFilter] = useState("All");
+  const [disciplineTypeFilter, setDisciplineTypeFilter] = useState("All");
+  const [disciplineGradeFilter, setDisciplineGradeFilter] = useState("All");
+  const [incidentToLinkCase, setIncidentToLinkCase] = useState<any | null>(null);
+  const [showLinkCaseDropdown, setShowLinkCaseDropdown] = useState(false);
+  const [linkCaseSearch, setLinkCaseSearch] = useState("");
+  const [incidentToReview, setIncidentToReview] = useState<any | null>(null);
+
   const [sessionDraft, setSessionDraft] = useState({ type: "Individual", progress: 3, summary: "", privateNotes: "" });
-  const [newCaseDraft, setNewCaseDraft] = useState({ studentId: "s1", category: "Academic Stress", riskLevel: "Medium", summary: "" });
+  const [newCaseDraft, setNewCaseDraft] = useState({
+    studentId: "s1",
+    category: "Academic",
+    riskLevel: "Medium",
+    summary: "",
+    assignedCounselor: "Puan Maryam",
+    openDate: new Date().toISOString().split("T")[0],
+    notes: "",
+  });
   const [newAptDraft, setNewAptDraft] = useState({ studentId: "s1", date: "", time: "", type: "Individual" });
   const [newReportDraft, setNewReportDraft] = useState({ studentId: "s1", reporterName: "", reporterRole: "Teacher", description: "", urgency: "Normal" });
 
   const [openModal, setOpenModal] = useState<string | null>(null);
+  const [mobileShowCaseDetail, setMobileShowCaseDetail] = useState(false);
+
+  // Sub-Tab Navigation inside Student Records
+  const [activeSubTab, setActiveSubTab] = useState("profile");
+
+  // Filters for left Student list
+  const [riskFilter, setRiskFilter] = useState("All");
+  const [issueFilter, setIssueFilter] = useState("All");
+
+  // Wellness Risk Tracking tab states
+  const [showSelfHarmWarnings, setShowSelfHarmWarnings] = useState(true);
+  const [riskSearchQuery, setRiskSearchQuery] = useState("");
+  const [riskLevelFilter, setRiskLevelFilter] = useState("All");
+  const [riskSortBy, setRiskSortBy] = useState("default");
+
+
+
+  // Case Manager State
+  const [selectedCaseId, setSelectedCaseId] = useState<string>("CASE-101");
+  const [caseSearch, setCaseSearch] = useState("");
+  const [caseStatusFilter, setCaseStatusFilter] = useState("All");
+  const [caseRiskFilter, setCaseRiskFilter] = useState("All");
+
+  const [studentSearchTerm, setStudentSearchTerm] = useState("");
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+
+  const [scheduleAptDraft, setScheduleAptDraft] = useState({
+    date: "",
+    time: "",
+    type: "Individual",
+    duration: "45 mins",
+    counselorName: "Puan Maryam",
+    notes: "",
+  });
+
+  const [editCaseDraft, setEditCaseDraft] = useState<any>(null);
+  const [closeCaseNotesDraft, setCloseCaseNotesDraft] = useState("");
+
+  // Appointments Module States
+  const [selectedAptDate, setSelectedAptDate] = useState("2026-06-22");
+  const [viewMode, setViewMode] = useState<"month" | "week">("month");
+  const [aptCounselorFilter, setAptCounselorFilter] = useState("All");
+  const [aptTypeFilter, setAptTypeFilter] = useState("All");
+  const [aptMonthFilter, setAptMonthFilter] = useState("2026-06");
+  const [selectedAptId, setSelectedAptId] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([
+    { id: "notif-1", text: "Appointment with Danish Kumar at 09:00 AM (Today)", read: false, date: "2026-06-22" },
+    { id: "notif-2", text: "Appointment with Aisyah Rahman at 11:30 AM (Today)", read: false, date: "2026-06-22" },
+  ]);
+
+
+  const [rescheduleDraft, setRescheduleDraft] = useState({ date: "", time: "" });
+
+  const getTimelineEvents = (caseObj: any) => {
+    if (!caseObj) return [];
+    const student = students.find((s) => s.id === caseObj.studentId);
+    const events: { date: string; title: string; description: string; urgency: "red" | "yellow" | "green" | "grey" }[] = [];
+
+    if (!student) return [];
+
+    // 1. Case Opened Event
+    events.push({
+      date: caseObj.openDate || "2026-06-08",
+      title: "Case Opened",
+      description: `Case opened for ${student.name} by ${caseObj.assignedCounselor || "Puan Maryam"}. Category: ${caseObj.category}. Notes: ${caseObj.summary || caseObj.notes || 'None'}`,
+      urgency: "grey",
+    });
+
+    // 2. Case Closed Event (if Closed)
+    if (caseObj.status === "Closed") {
+      events.push({
+        date: caseObj.closedDate || caseObj.lastActivityDate || new Date().toISOString().split("T")[0],
+        title: "Case Closed",
+        description: `Case resolved and closed by ${caseObj.closedBy || "Puan Maryam"}. Notes: ${caseObj.notes || 'None'}`,
+        urgency: "green",
+      });
+    }
+
+    // 3. Sessions Logged Events
+    if (student.sessionsLog) {
+      student.sessionsLog.forEach((sess: any) => {
+        events.push({
+          date: sess.date,
+          title: `Session Logged (${sess.type})`,
+          description: `Conducted by ${sess.counselorName || "Puan Maryam"}. Duration: ${sess.duration || "45 mins"}. Outcome: ${sess.outcome || "Coping strategies discussed"}. Notes: ${sess.notes || "None"}`,
+          urgency: "green",
+        });
+      });
+    }
+
+    // 4. Interventions Added Events
+    if (student.interventions) {
+      student.interventions.forEach((inv: any) => {
+        let urg: "red" | "yellow" | "green" | "grey" = "yellow";
+        if (inv.status === "Completed") urg = "green";
+        if (inv.status === "Discontinued") urg = "red";
+
+        events.push({
+          date: inv.startDate,
+          title: `Intervention Added: ${inv.type}`,
+          description: `Assigned to ${inv.assignedPerson || "Cikgu Nadia"}. Status: ${inv.status || "Active"}. Outcome notes: ${inv.outcomeNotes || "None"}`,
+          urgency: urg,
+        });
+      });
+    }
+
+    // 5. Referrals Received Events
+    if (student.referrals) {
+      student.referrals.forEach((ref: any) => {
+        let urg: "red" | "yellow" | "green" | "grey" = "grey";
+        if (ref.status !== "Closed") {
+          urg = ref.urgency === "High" ? "red" : ref.urgency === "Medium" ? "yellow" : "grey";
+        }
+
+        events.push({
+          date: ref.dateSubmitted,
+          title: `Referral Received (Source: ${ref.whoReferred})`,
+          description: `Urgency level: ${ref.urgency || "Medium"}. Status: ${ref.status || "Open"}. Reason: ${ref.reason}`,
+          urgency: urg,
+        });
+      });
+    }
+
+    // 6. Overdue Tasks Events
+    if (student.pendingTasks) {
+      student.pendingTasks.forEach((task: any) => {
+        if (task.urgency === "overdue") {
+          events.push({
+            date: task.dueDate || caseObj.openDate,
+            title: "Follow-up Task Overdue",
+            description: `Action needed: "${task.text}" (Due Date: ${task.dueDate || "Passed"})`,
+            urgency: "red",
+          });
+        }
+      });
+    }
+
+    // 7. Appointment Events
+    const studentApts = appointments.filter((a) => a.studentId === student.id);
+    studentApts.forEach((apt: any) => {
+      let urg: "red" | "yellow" | "green" | "grey" = "grey";
+      if (apt.status === "Confirmed") urg = "green";
+      if (apt.status === "Pending") urg = "yellow";
+      if (apt.status === "Cancelled") urg = "red";
+
+      events.push({
+        date: apt.date,
+        title: `Appointment ${apt.status} (${apt.type})`,
+        description: `Scheduled with ${apt.counselorName || "Puan Maryam"} at ${apt.time}. Duration: ${apt.duration || "45 mins"}. Notes: ${apt.notes || "None"}.`,
+        urgency: urg,
+      });
+    });
+
+    // 8. Linked Discipline Incidents
+    const studentIncidents = disciplineIncidents.filter((i) => i.studentId === student.id && i.counsellingCaseId === caseObj.id);
+    studentIncidents.forEach((inc: any) => {
+      events.push({
+        date: inc.date,
+        title: `Discipline Incident Linked (${inc.id})`,
+        description: `Discipline incident ${inc.id} (${inc.type}) linked to this case. Description: ${inc.description}`,
+        urgency: "yellow",
+      });
+    });
+
+    // Sort chronologically (newest first)
+    return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  };
 
   // Initialize/Load State from Local Storage
   useEffect(() => {
@@ -293,12 +821,122 @@ function CounsellorPortal() {
     if (saved) {
       try {
         const s = JSON.parse(saved);
-        if (s.students) setStudents(s.students);
-        if (s.cases) setCases(s.cases);
-        if (s.appointments) setAppointments(s.appointments);
-        if (s.riskFactors) setRiskFactors(s.riskFactors);
-        if (s.reports) setReports(s.reports);
-        if (s.disciplineIncidents) setDisciplineIncidents(s.disciplineIncidents);
+        if (s.students) {
+          const mergedStudents = s.students.map((savedStud: any) => {
+            const defStud = DEFAULT_STUDENTS_PROFILE.find((ds) => ds.id === savedStud.id);
+            if (!defStud) return savedStud;
+
+            const sessionsLog = (savedStud.sessionsLog && savedStud.sessionsLog.length > 0)
+              ? savedStud.sessionsLog
+              : (defStud.sessionsLog || []);
+
+            const interventions = ((savedStud.interventions && savedStud.interventions.length > 0)
+              ? savedStud.interventions
+              : (defStud.interventions || [])).map((inv: any) => ({
+                status: "Active",
+                endDate: "",
+                ...inv
+              }));
+
+            const referrals = ((savedStud.referrals && savedStud.referrals.length > 0)
+              ? savedStud.referrals
+              : (defStud.referrals || [])).map((ref: any) => ({
+                whoReferred: "Teacher",
+                urgency: "Medium",
+                status: "Open",
+                notes: "",
+                ...ref
+              }));
+
+            const goals = ((savedStud.goals && savedStud.goals.length > 0)
+              ? savedStud.goals
+              : (defStud.goals || [])).map((goal: any) => ({
+                status: "Not Started",
+                ...goal
+              }));
+
+            const documents = (savedStud.documents && savedStud.documents.length > 0)
+              ? savedStud.documents
+              : (defStud.documents || []);
+
+            const pendingTasks = (savedStud.pendingTasks && savedStud.pendingTasks.length > 0)
+              ? savedStud.pendingTasks
+              : (defStud.pendingTasks || []);
+
+            const tags = (savedStud.tags && savedStud.tags.length > 0)
+              ? savedStud.tags
+              : (defStud.tags || []);
+
+            return {
+              ...defStud,
+              ...savedStud,
+              sessionsLog,
+              interventions,
+              referrals,
+              goals,
+              documents,
+              pendingTasks,
+              tags,
+              caseId: savedStud.caseId || defStud.caseId || `CASE-${savedStud.id}`,
+              riskLevel: savedStud.riskLevel || defStud.riskLevel || "Low",
+              academic: { ...defStud.academic, ...savedStud.academic },
+              attendance: { ...defStud.attendance, ...savedStud.attendance },
+              support: { ...defStud.support, ...savedStud.support },
+              sessions: sessionsLog
+            };
+          });
+          setStudents(mergedStudents);
+        } else {
+          setStudents(DEFAULT_STUDENTS_PROFILE);
+        }
+        if (s.cases) {
+          const mappedCases = s.cases.map((c: any) => {
+            let status = c.status;
+            if (status === "Active") status = "In Progress";
+            else if (status === "Observation" || status === "Referred") status = "Open";
+            else if (status === "Resolved") status = "Closed";
+            
+            return {
+              assignedCounselor: "Puan Maryam",
+              openDate: c.openDate || "2026-06-08",
+              notes: c.notes || c.summary || "",
+              closedDate: c.closedDate || "",
+              closedBy: c.closedBy || "",
+              ...c,
+              status
+            };
+          });
+          setCases(mappedCases);
+        } else {
+          setCases(DEFAULT_CASES);
+        }
+        if (s.appointments) {
+          const mapped = s.appointments.map((apt: any) => {
+            const defApt = DEFAULT_APPOINTMENTS.find((d) => d.id === apt.id);
+            return {
+              caseId: apt.caseId || defApt?.caseId || "CASE-101",
+              duration: apt.duration || defApt?.duration || "45 mins",
+              counselorName: apt.counselorName || defApt?.counselorName || "Puan Maryam",
+              notes: apt.notes || defApt?.notes || "",
+              reminder: apt.reminder || defApt?.reminder || "none",
+              ...defApt,
+              ...apt
+            };
+          });
+          const allApts = [...mapped];
+          DEFAULT_APPOINTMENTS.forEach((def) => {
+            if (!allApts.some((a) => a.id === def.id)) {
+              allApts.push(def);
+            }
+          });
+          setAppointments(allApts);
+        } else {
+          setAppointments(DEFAULT_APPOINTMENTS);
+        }
+        setNotifications(s.notifications || []);
+        setRiskFactors(s.riskFactors || DEFAULT_RISK_FACTORS);
+        setReports(s.reports || DEFAULT_REPORTS);
+        setDisciplineIncidents(s.disciplineIncidents || DEFAULT_DISCIPLINE_INCIDENTS);
       } catch (e) {
         console.error("Error loading counsellor state", e);
       }
@@ -312,6 +950,28 @@ function CounsellorPortal() {
     }
   }, []);
 
+  // Listen for storage events to enable real-time sync across portals
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "counsellor_state" && e.newValue) {
+        try {
+          const s = JSON.parse(e.newValue);
+          if (s.students) setStudents(s.students);
+          if (s.cases) setCases(s.cases);
+          if (s.appointments) setAppointments(s.appointments);
+          if (s.riskFactors) setRiskFactors(s.riskFactors);
+          if (s.reports) setReports(s.reports);
+          if (s.disciplineIncidents) setDisciplineIncidents(s.disciplineIncidents);
+          if (s.notifications) setNotifications(s.notifications);
+        } catch (err) {
+          console.error("Storage sync error", err);
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   // Save State to Local Storage
   const saveState = (updatedData: {
     students?: any[];
@@ -320,6 +980,7 @@ function CounsellorPortal() {
     riskFactors?: Record<string, any>;
     reports?: any[];
     disciplineIncidents?: any[];
+    notifications?: any[];
   }) => {
     const nextStudents = updatedData.students ?? students;
     const nextCases = updatedData.cases ?? cases;
@@ -327,6 +988,7 @@ function CounsellorPortal() {
     const nextRiskFactors = updatedData.riskFactors ?? riskFactors;
     const nextReports = updatedData.reports ?? reports;
     const nextDisciplineIncidents = updatedData.disciplineIncidents ?? disciplineIncidents;
+    const nextNotifications = updatedData.notifications ?? notifications;
 
     setStudents(nextStudents);
     setCases(nextCases);
@@ -334,6 +996,7 @@ function CounsellorPortal() {
     setRiskFactors(nextRiskFactors);
     setReports(nextReports);
     setDisciplineIncidents(nextDisciplineIncidents);
+    setNotifications(nextNotifications);
 
     localStorage.setItem(
       "counsellor_state",
@@ -344,6 +1007,7 @@ function CounsellorPortal() {
         riskFactors: nextRiskFactors,
         reports: nextReports,
         disciplineIncidents: nextDisciplineIncidents,
+        notifications: nextNotifications,
       })
     );
   };
@@ -351,43 +1015,40 @@ function CounsellorPortal() {
   // Helper: Retrieve Selected Student Record
   const selectedStudent = students.find((s) => s.id === selectedStudentId) || students[0];
 
-  // Action: Log New Counselling Session
-  const handleAddSession = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sessionDraft.summary.trim()) return;
 
-    const newSession = {
-      id: `s-${Date.now()}`,
-      date: new Date().toISOString().split("T")[0],
-      type: sessionDraft.type,
-      progress: Number(sessionDraft.progress),
-      summary: sessionDraft.summary,
-      privateNotes: sessionDraft.privateNotes,
-    };
 
+  // Action: Toggle Task Status
+  const handleToggleTaskStatus = (taskId: string) => {
     const updatedStudents = students.map((stud) => {
       if (stud.id === selectedStudentId) {
+        const updatedTasks = (stud.pendingTasks || []).map((t: any) =>
+          t.id === taskId ? { ...t, urgency: t.urgency === "completed" ? "pending" : "completed" } : t
+        );
         return {
           ...stud,
-          sessions: [newSession, ...(stud.sessions || [])],
+          pendingTasks: updatedTasks,
         };
       }
       return stud;
     });
+    saveState({ students: updatedStudents });
+  };
 
-    // Automatically update the "lastSessionDate" in the corresponding Case File
-    const updatedCases = cases.map((c) => {
-      if (c.studentId === selectedStudentId) {
+  const handleToggleTaskStatusGlobal = (taskId: string) => {
+    const updatedStudents = students.map((stud) => {
+      const hasTask = stud.pendingTasks?.some((t: any) => t.id === taskId);
+      if (hasTask) {
+        const updatedTasks = (stud.pendingTasks || []).map((t: any) =>
+          t.id === taskId ? { ...t, urgency: t.urgency === "completed" ? "pending" : "completed" } : t
+        );
         return {
-          ...c,
-          lastSessionDate: newSession.date,
+          ...stud,
+          pendingTasks: updatedTasks,
         };
       }
-      return c;
+      return stud;
     });
-
-    saveState({ students: updatedStudents, cases: updatedCases });
-    setSessionDraft({ type: "Individual", progress: 3, summary: "", privateNotes: "" });
+    saveState({ students: updatedStudents });
   };
 
   // Action: Create a New Case File
@@ -401,39 +1062,274 @@ function CounsellorPortal() {
       studentId: newCaseDraft.studentId,
       studentName: stud.name,
       avatar: stud.avatar,
-      category: newCaseDraft.category,
-      riskLevel: newCaseDraft.riskLevel,
-      status: "Active",
-      openDate: new Date().toISOString().split("T")[0],
+      category: newCaseDraft.category, // Behaviour / Academic / Emotional / Career / Referral
+      riskLevel: newCaseDraft.riskLevel, // High / Medium / Low
+      status: "Open" as const,
+      openDate: newCaseDraft.openDate || new Date().toISOString().split("T")[0],
       lastSessionDate: "None",
-      summary: newCaseDraft.summary || "No description provided.",
+      summary: newCaseDraft.notes || "No description provided.",
+      assignedCounselor: newCaseDraft.assignedCounselor || "Puan Maryam",
+      notes: newCaseDraft.notes || "",
+      closedDate: "",
+      closedBy: "",
     };
 
-    saveState({ cases: [newCase, ...cases] });
+    const updatedCases = [newCase, ...cases];
+    
+    let updatedIncidents = disciplineIncidents;
+    let updatedStudents = students;
+
+    if (incidentToLinkCase) {
+      updatedIncidents = disciplineIncidents.map((i) =>
+        i.id === incidentToLinkCase.id
+          ? {
+              ...i,
+              status: "Linked" as const,
+              counsellingCaseId: newCase.id,
+            }
+          : i
+      );
+
+      updatedStudents = students.map((sObj) => {
+        if (sObj.id === newCase.studentId) {
+          const newReferral = {
+            id: `r-${Date.now()}`,
+            whoReferred: (incidentToLinkCase.reporterRole || "Teacher") as any,
+            reason: `Discipline incident ${incidentToLinkCase.id}: ${incidentToLinkCase.description}`,
+            dateSubmitted: new Date().toISOString().split("T")[0],
+            urgency: newCase.riskLevel as any,
+            status: "Open" as const,
+            notes: `Auto-created case from discipline incident ${incidentToLinkCase.id}`,
+          };
+          return {
+            ...sObj,
+            caseId: newCase.id,
+            riskLevel: newCase.riskLevel,
+            referrals: [newReferral, ...(sObj.referrals || [])],
+          };
+        }
+        return sObj;
+      });
+
+      setIncidentToLinkCase(null);
+    }
+
+    saveState({
+      cases: updatedCases,
+      disciplineIncidents: updatedIncidents,
+      students: updatedStudents,
+    });
+
     setOpenModal(null);
-    setNewCaseDraft({ studentId: "s1", category: "Academic Stress", riskLevel: "Medium", summary: "" });
+    setNewCaseDraft({
+      studentId: "s1",
+      category: "Academic",
+      riskLevel: "Medium",
+      summary: "",
+      assignedCounselor: "Puan Maryam",
+      openDate: new Date().toISOString().split("T")[0],
+      notes: "",
+    });
+    setStudentSearchTerm("");
+    setSelectedCaseId(newCase.id);
+    setActiveTab("cases");
+    setMobileShowCaseDetail(true);
   };
 
-  // Action: Book a New Session/Appointment
-  const handleCreateAppointment = (e: React.FormEvent) => {
+  // Action: Update Case
+  const handleUpdateCase = (e: React.FormEvent) => {
     e.preventDefault();
-    const stud = students.find((s) => s.id === newAptDraft.studentId);
-    if (!stud) return;
+    if (!editCaseDraft) return;
 
-    const newApt = {
-      id: `apt-${Date.now()}`,
-      studentId: newAptDraft.studentId,
-      studentName: stud.name,
-      avatar: stud.avatar,
-      date: newAptDraft.date,
-      time: newAptDraft.time,
-      type: newAptDraft.type,
-      status: "Confirmed" as const,
+    const updatedCases = cases.map((c) => {
+      if (c.id === editCaseDraft.id) {
+        return {
+          ...c,
+          category: editCaseDraft.category,
+          riskLevel: editCaseDraft.riskLevel,
+          assignedCounselor: editCaseDraft.assignedCounselor,
+          status: editCaseDraft.status,
+          notes: editCaseDraft.notes,
+        };
+      }
+      return c;
+    });
+
+    saveState({ cases: updatedCases });
+    setOpenModal(null);
+    setEditCaseDraft(null);
+  };
+
+  // Action: Schedule Session for Case
+  const handleScheduleCaseSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    const caseObj = cases.find(c => c.id === selectedCaseId);
+    if (!caseObj) return;
+    const student = students.find(s => s.id === caseObj.studentId);
+    if (!student) return;
+
+    const sessionDate = scheduleAptDraft.date || new Date().toISOString().split("T")[0];
+
+    const newSession = {
+      id: `s-${Date.now()}`,
+      date: sessionDate,
+      type: scheduleAptDraft.type,
+      duration: scheduleAptDraft.duration,
+      counselorName: scheduleAptDraft.counselorName,
+      notes: scheduleAptDraft.notes || "Scheduled case session",
+      outcome: "Scheduled",
+      followUpTasks: [],
     };
 
-    saveState({ appointments: [newApt, ...appointments] });
+    const updatedStudents = students.map((stud) => {
+      if (stud.id === student.id) {
+        return {
+          ...stud,
+          lastActivityDate: sessionDate,
+          sessionsLog: [newSession, ...(stud.sessionsLog || [])],
+          sessions: [newSession, ...(stud.sessions || [])],
+        };
+      }
+      return stud;
+    });
+
+    const updatedCases = cases.map((c) => {
+      if (c.id === caseObj.id) {
+        return {
+          ...c,
+          lastSessionDate: sessionDate,
+        };
+      }
+      return c;
+    });
+
+    saveState({ students: updatedStudents, cases: updatedCases });
     setOpenModal(null);
-    setNewAptDraft({ studentId: "s1", date: "", time: "", type: "Individual" });
+    setScheduleAptDraft({
+      date: "",
+      time: "",
+      type: "Individual",
+      duration: "45 mins",
+      counselorName: "Puan Maryam",
+      notes: "",
+    });
+  };
+
+  // Action: Close Case
+  const handleCloseCase = (caseId: string, closingNotes: string) => {
+    const updatedCases = cases.map((c) => {
+      if (c.id === caseId) {
+        return {
+          ...c,
+          status: "Closed" as const,
+          closedDate: new Date().toISOString().split("T")[0],
+          closedBy: "Puan Maryam",
+          notes: (c.notes || "") + (closingNotes.trim() ? `\n[Closure Resolution] ${closingNotes}` : ""),
+        };
+      }
+      return c;
+    });
+
+    saveState({ cases: updatedCases });
+    setOpenModal(null);
+  };
+
+
+
+  // Action: Reschedule Appointment
+  const handleRescheduleAppointment = (aptId: string, newDate: string, newTime: string) => {
+    if (!newDate || !newTime) return;
+    const updatedApts = appointments.map((a) => {
+      if (a.id === aptId) {
+        return {
+          ...a,
+          date: newDate,
+          time: newTime,
+          status: "Confirmed" as const, // Auto-confirm rescheduled
+        };
+      }
+      return a;
+    });
+
+    // Log reschedule into student's sessions log
+    const targetApt = appointments.find((a) => a.id === aptId);
+    let updatedStudents = students;
+    if (targetApt) {
+      updatedStudents = students.map((s) => {
+        if (s.id === targetApt.studentId) {
+          const newSessionLog = {
+            id: `sess-${Date.now()}`,
+            date: newDate,
+            type: targetApt.type,
+            duration: targetApt.duration,
+            counselorName: targetApt.counselorName,
+            notes: `Appointment rescheduled from ${targetApt.date} ${targetApt.time} to ${newDate} ${newTime}.`,
+            outcome: `Rescheduled`,
+            followUpTasks: [],
+          };
+          return {
+            ...s,
+            sessionsLog: [newSessionLog, ...(s.sessionsLog || [])],
+            lastActivityDate: newDate,
+          };
+        }
+        return s;
+      });
+    }
+
+    saveState({
+      appointments: updatedApts,
+      students: updatedStudents,
+    });
+    setOpenModal(null);
+  };
+
+  // Action: Cancel Appointment
+  const handleCancelAppointment = (aptId: string) => {
+    if (!window.confirm("Are you sure you want to cancel this appointment?")) {
+      return;
+    }
+    const updatedApts = appointments.map((a) => {
+      if (a.id === aptId) {
+        return {
+          ...a,
+          status: "Cancelled" as const,
+        };
+      }
+      return a;
+    });
+
+    // Log cancellation into student's sessions log
+    const targetApt = appointments.find((a) => a.id === aptId);
+    let updatedStudents = students;
+    if (targetApt) {
+      updatedStudents = students.map((s) => {
+        if (s.id === targetApt.studentId) {
+          const newSessionLog = {
+            id: `sess-${Date.now()}`,
+            date: new Date().toISOString().split("T")[0],
+            type: targetApt.type,
+            duration: targetApt.duration,
+            counselorName: targetApt.counselorName,
+            notes: `Appointment on ${targetApt.date} at ${targetApt.time} was cancelled.`,
+            outcome: `Cancelled`,
+            followUpTasks: [],
+          };
+          return {
+            ...s,
+            sessionsLog: [newSessionLog, ...(s.sessionsLog || [])],
+            lastActivityDate: new Date().toISOString().split("T")[0],
+          };
+        }
+        return s;
+      });
+    }
+
+    saveState({
+      appointments: updatedApts,
+      students: updatedStudents,
+    });
+    setOpenModal(null);
   };
 
   // Action: Log Confidential Report from the community
@@ -443,7 +1339,7 @@ function CounsellorPortal() {
     if (!stud) return;
 
     const newRep = {
-      id: `rep-${Date.now()}`,
+      id: `rep-${Math.floor(200 + Math.random() * 800)}`,
       reporterName: newReportDraft.reporterName || "Anonymous Parent",
       reporterRole: newReportDraft.reporterRole,
       studentId: newReportDraft.studentId,
@@ -457,84 +1353,219 @@ function CounsellorPortal() {
     saveState({ reports: [newRep, ...reports] });
     setOpenModal(null);
     setNewReportDraft({ studentId: "s1", reporterName: "", reporterRole: "Teacher", description: "", urgency: "Normal" });
+    setNewReportStudentSearch("");
+  };
+
+  // Helper to infer case category from narrative text
+  const inferCategoryFromNarrative = (desc: string): string => {
+    const text = desc.toLowerCase();
+    if (text.includes("academic") || text.includes("homework") || text.includes("grade") || text.includes("test") || text.includes("exam") || text.includes("study")) {
+      return "Academic";
+    }
+    if (text.includes("behavior") || text.includes("behaviour") || text.includes("fight") || text.includes("altercation") || text.includes("disrupt") || text.includes("yell") || text.includes("throw") || text.includes("temper") || text.includes("outburst")) {
+      return "Behaviour";
+    }
+    if (text.includes("anxious") || text.includes("anxiety") || text.includes("emotional") || text.includes("stomach") || text.includes("sad") || text.includes("cry") || text.includes("depressed") || text.includes("withdrawal") || text.includes("distress") || text.includes("tearful") || text.includes("worry")) {
+      return "Emotional";
+    }
+    if (text.includes("career") || text.includes("job") || text.includes("stem") || text.includes("college") || text.includes("future")) {
+      return "Career";
+    }
+    return "Referral";
   };
 
   // Action: File Confidential Report as active case
   const handleFileReport = (report: any) => {
     const caseId = `CASE-${Math.floor(100 + Math.random() * 900)}`;
-    const stud = students.find((s) => s.id === report.studentId);
-    
+    const stud = students.find((s) => s.id === report.studentId || s.name === report.studentName);
+    const studentId = stud ? stud.id : report.studentId || "s1";
+    const studentAvatar = stud ? stud.avatar : "🧒";
+
+    const inferredCategory = inferCategoryFromNarrative(report.description);
+    const riskLevelVal = report.urgency === "High" || report.urgency === "Urgent" ? "High" : "Medium";
+
     const newCase = {
       id: caseId,
-      studentId: report.studentId,
+      studentId: studentId,
       studentName: report.studentName,
-      avatar: stud ? stud.avatar : "🧒",
-      category: report.description.toLowerCase().includes("academic") ? "Academic Stress" : "Emotional Regulation",
-      riskLevel: report.urgency === "Urgent" || report.urgency === "High" ? "High" : "Medium",
-      status: "Active",
+      avatar: studentAvatar,
+      category: inferredCategory,
+      riskLevel: riskLevelVal as any,
+      status: "Open" as const,
       openDate: new Date().toISOString().split("T")[0],
       lastSessionDate: "None",
-      summary: `Filed from confidential report: ${report.description}`,
+      summary: report.description,
+      assignedCounselor: "Puan Maryam",
+      notes: report.description,
+      referralSource: `${report.reporterName} (${report.reporterRole})`,
+      closedDate: "",
+      closedBy: "",
     };
 
+    const newReferral = {
+      id: `r-${Date.now()}`,
+      whoReferred: report.reporterRole,
+      reason: report.description,
+      dateSubmitted: report.date,
+      urgency: report.urgency === "High" || report.urgency === "Urgent" ? "High" as const : "Medium" as const,
+      status: "Open" as const,
+      notes: `Filed as Case ${caseId}`,
+    };
+
+    // Update student referrals log, risk level and caseId
+    const updatedStudents = students.map((s) => {
+      if (s.id === studentId) {
+        return {
+          ...s,
+          caseId: caseId,
+          riskLevel: riskLevelVal,
+          referrals: [newReferral, ...(s.referrals || [])],
+          lastActivityDate: new Date().toISOString().split("T")[0],
+        };
+      }
+      return s;
+    });
+
     const updatedReports = reports.map((r) =>
-      r.id === report.id ? { ...r, status: "Filed as Case" } : r
+      r.id === report.id
+        ? {
+            ...r,
+            status: "Filed as Case",
+            actionedDate: new Date().toISOString().split("T")[0],
+          }
+        : r
     );
 
     saveState({
       cases: [newCase, ...cases],
       reports: updatedReports,
+      students: updatedStudents,
     });
+
+    // Navigate counselor to the newly created case
+    setActiveTab("cases");
+    setSelectedCaseId(caseId);
+    setMobileShowCaseDetail(true);
   };
 
-  // Action: Dismiss confidential report
+  // Action: Dismiss confidential report (sets state to show confirmation prompt)
   const handleDismissReport = (reportId: string) => {
+    const rep = reports.find((r) => r.id === reportId);
+    if (rep) {
+      setReportToDismiss(rep);
+    }
+  };
+
+  const confirmDismiss = () => {
+    if (!reportToDismiss) return;
     const updatedReports = reports.map((r) =>
-      r.id === reportId ? { ...r, status: "Dismissed" } : r
+      r.id === reportToDismiss.id
+        ? {
+            ...r,
+            status: "Dismissed",
+            actionedDate: new Date().toISOString().split("T")[0],
+          }
+        : r
     );
     saveState({ reports: updatedReports });
+    setReportToDismiss(null);
   };
 
-  // Action: Intake disciplinary incident into case management
-  const handleIntakeDiscipline = (incident: any) => {
-    const caseId = `CASE-${Math.floor(100 + Math.random() * 900)}`;
-    const newCase = {
-      id: caseId,
+  // Action: Prefill and open Case Form from Discipline Incident
+  const handleCreateCaseFromIncident = (incident: any) => {
+    let category = "Behaviour";
+    const type = incident.type?.toLowerCase() || "";
+    if (type.includes("academic") || type.includes("cheat") || type.includes("misconduct")) {
+      category = "Academic";
+    } else if (type.includes("emotional") || type.includes("anxious") || type.includes("panic") || type.includes("depression")) {
+      category = "Emotional";
+    } else if (type.includes("career") || type.includes("job") || type.includes("future")) {
+      category = "Career";
+    } else if (type.includes("truancy") || type.includes("attendance")) {
+      category = "Referral";
+    }
+
+    const isHighRisk = type.includes("aggression") || type.includes("bullying");
+
+    setNewCaseDraft({
       studentId: incident.studentId,
-      studentName: incident.studentName,
-      avatar: incident.avatar,
-      category: "Behavioral",
-      riskLevel: "Medium",
-      status: "Active",
+      category: category,
+      riskLevel: isHighRisk ? "High" : "Medium",
+      summary: incident.description,
+      assignedCounselor: "Puan Maryam",
       openDate: new Date().toISOString().split("T")[0],
-      lastSessionDate: "None",
-      summary: `Discipline intake. Infraction: ${incident.infraction}`,
-    };
+      notes: incident.description,
+    });
+    setIncidentToLinkCase(incident);
+    setOpenModal("newCase");
+  };
+
+  // Action: Link Discipline Incident to an existing open Case
+  const handleLinkIncidentToCase = (incidentId: string, caseId: string) => {
+    const incident = disciplineIncidents.find((i) => i.id === incidentId);
+    if (!incident) return;
 
     const updatedIncidents = disciplineIncidents.map((i) =>
-      i.id === incident.id
+      i.id === incidentId
         ? {
             ...i,
-            disciplineStatus: "Referred to Counselling",
+            status: "Linked" as const,
             counsellingCaseId: caseId,
-            interventionNotes: "Case file created. Initiated student assessment.",
           }
         : i
     );
 
-    saveState({
-      cases: [newCase, ...cases],
-      disciplineIncidents: updatedIncidents,
+    const updatedStudents = students.map((sObj) => {
+      if (sObj.id === incident.studentId) {
+        const newReferral = {
+          id: `r-${Date.now()}`,
+          whoReferred: (incident.reporterRole || "Teacher") as any,
+          reason: `Discipline incident ${incident.id}: ${incident.description}`,
+          dateSubmitted: new Date().toISOString().split("T")[0],
+          urgency: "Medium" as const,
+          status: "Open" as const,
+          notes: `Linked to existing case ${caseId}.`,
+        };
+        return {
+          ...sObj,
+          referrals: [newReferral, ...(sObj.referrals || [])],
+        };
+      }
+      return sObj;
     });
+
+    saveState({
+      disciplineIncidents: updatedIncidents,
+      students: updatedStudents,
+    });
+
+    setShowLinkCaseDropdown(false);
+    setLinkCaseSearch("");
   };
 
-  // Action: Add counselling intervention comment to disciplinary incident
-  const handleSaveDisciplineIntervention = (incidentId: string, notes: string) => {
-    if (!notes.trim()) return;
+  // Action: Confirm Review Discipline Incident
+  const confirmReviewIncident = () => {
+    if (!incidentToReview) return;
+
     const updatedIncidents = disciplineIncidents.map((i) =>
-      i.id === incidentId ? { ...i, interventionNotes: notes, disciplineStatus: "Action Taken" } : i
+      i.id === incidentToReview.id
+        ? {
+            ...i,
+            status: "Reviewed" as const,
+            counsellingCaseId: null,
+          }
+        : i
     );
+
     saveState({ disciplineIncidents: updatedIncidents });
+    setIncidentToReview(null);
+  };
+
+  // Action: Navigate to student records
+  const handleViewStudentRecord = (studentId: string) => {
+    setSelectedStudentId(studentId);
+    setActiveSubTab("profile");
+    setActiveTab("records");
   };
 
   // Action: Toggle / Update Risk Factor Indicators
@@ -566,7 +1597,14 @@ function CounsellorPortal() {
   // Action: Update case status
   const handleUpdateCaseStatus = (caseId: string, newStatus: string) => {
     const updatedCases = cases.map((c) =>
-      c.id === caseId ? { ...c, status: newStatus } : c
+      c.id === caseId
+        ? {
+            ...c,
+            status: newStatus,
+            closedDate: newStatus === "Closed" ? new Date().toISOString().split("T")[0] : c.closedDate,
+            closedBy: newStatus === "Closed" ? "Puan Maryam" : c.closedBy,
+          }
+        : c
     );
     saveState({ cases: updatedCases });
   };
@@ -581,31 +1619,98 @@ function CounsellorPortal() {
 
   // Action: Toggle Appointment Status
   const handleToggleAptStatus = (aptId: string, newStatus: string) => {
-    const updatedApts = appointments.map((a) =>
-      a.id === aptId ? { ...a, status: newStatus } : a
-    );
-    saveState({ appointments: updatedApts });
+    if (newStatus === "Cancelled") {
+      handleCancelAppointment(aptId);
+    } else {
+      const updatedApts = appointments.map((a) =>
+        a.id === aptId ? { ...a, status: newStatus } : a
+      );
+
+      let updatedStudents = students;
+      if (newStatus === "Completed") {
+        const targetApt = appointments.find((a) => a.id === aptId);
+        if (targetApt) {
+          updatedStudents = students.map((s) => {
+            if (s.id === targetApt.studentId) {
+              const newSessionLog = {
+                id: `sess-${Date.now()}`,
+                date: new Date().toISOString().split("T")[0],
+                type: targetApt.type,
+                duration: targetApt.duration,
+                counselorName: targetApt.counselorName,
+                notes: targetApt.notes || "Completed scheduled session check-in.",
+                outcome: "Completed",
+                followUpTasks: [],
+              };
+              return {
+                ...s,
+                sessionsLog: [newSessionLog, ...(s.sessionsLog || [])],
+                lastActivityDate: new Date().toISOString().split("T")[0],
+              };
+            }
+            return s;
+          });
+        }
+      }
+
+      saveState({
+        appointments: updatedApts,
+        students: updatedStudents,
+      });
+    }
   };
 
   // Statistics Computations
-  const activeCasesCount = cases.filter((c) => c.status === "Active" || c.status === "Observation").length;
-  const newReportsCount = reports.filter((r) => r.status === "New").length;
-  const todayDateStr = new Date().toISOString().split("T")[0];
-  const appointmentsToday = appointments.filter((a) => a.status === "Confirmed").length;
-  const highRiskStudentsCount = Object.values(riskFactors).filter(
-    (rf: any) => rf.academicDrop >= 4 || rf.withdrawal >= 4 || rf.outbursts >= 4 || rf.selfHarmAlert
+  const referenceDate = "2026-06-22"; // Simulated appointment today date is June 22, 2026
+  
+  const highRiskStudentsCount = students.filter((stud) => {
+    const rf = riskFactors[stud.id] || { academicDrop: 1, withdrawal: 1, outbursts: 1, selfHarmAlert: false };
+    const maxIndex = Math.max(rf.academicDrop, rf.withdrawal, rf.outbursts);
+    return (showSelfHarmWarnings && rf.selfHarmAlert) || maxIndex >= 3;
+  }).length;
+
+  const openCasesCount = cases.filter(c => c.status !== "Closed").length;
+  
+  const todayAppointmentsCount = appointments.filter(
+    (a) => a.date === referenceDate && a.status === "Confirmed"
   ).length;
 
-  // Search filter students
-  const filteredStudents = students.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const dynamicOverdueTasksCount = students.flatMap(s => s.pendingTasks || []).filter(t => {
+    return t.urgency !== "completed" && t.dueDate < todayDateStr;
+  }).length;
+
+  const dueTodayTasksCount = students.flatMap(s => s.pendingTasks || []).filter(t => {
+    return t.urgency !== "completed" && t.dueDate === todayDateStr;
+  }).length;
+
+  const newReportsCount = reports.filter((r) => r.status === "New").length;
+
+  const newIncidentsCount = disciplineIncidents.filter((i) => i.status === "New").length;
+
+  // Search filter and sort students by last activity
+  const sortedStudents = [...students].sort((a, b) => {
+    const dateA = a.lastActivityDate || "";
+    const dateB = b.lastActivityDate || "";
+    return dateB.localeCompare(dateA);
+  });
+
+  const filteredStudents = sortedStudents.filter((s) => {
+    const matchSearch =
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.grade.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.caseId && s.caseId.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchRisk = riskFilter === "All" ? true : s.riskLevel === riskFilter;
+    const matchIssue = issueFilter === "All" ? true : s.tags?.includes(issueFilter);
+
+    return matchSearch && matchRisk && matchIssue;
+  });
 
   return (
-    <div className="min-h-screen pb-24 md:pb-10 bg-[oklch(0.99_0.005_95)] overflow-x-hidden w-full">
+    <div className="min-h-screen pb-24 md:pb-10 bg-[oklch(0.99_0.005_95)] w-full">
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-20 border-b-2 border-border bg-background/90 backdrop-blur w-full">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3 md:px-8">
           <Link to="/" className="flex items-center gap-2 font-display text-2xl font-bold">
             <span className="text-3xl animate-wiggle">🧠</span>
             <span className="bg-gradient-to-r from-duo-pink to-duo-purple bg-clip-text text-transparent">
@@ -631,7 +1736,7 @@ function CounsellorPortal() {
       </header>
 
       {/* Main Layout Workspace Grid */}
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[240px_minmax(0,1fr)] md:px-8 w-full min-w-0">
+      <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 md:grid-cols-[240px_1fr] md:px-8 w-full min-w-0">
         
         {/* Navigation Sidebar */}
         <aside className="hidden md:block">
@@ -647,18 +1752,47 @@ function CounsellorPortal() {
                   let hasBadge = false;
                   let badgeValue = "";
 
-                  if (item.id === "reports" && newReportsCount > 0) {
-                    hasBadge = true;
-                    badgeValue = `${newReportsCount} New`;
-                  } else if (item.id === "discipline" && disciplineIncidents.filter(i => i.disciplineStatus === "Pending Review").length > 0) {
-                    hasBadge = true;
-                    badgeValue = "Alert";
+                  if (item.id === "risk") {
+                    const count = highRiskStudentsCount;
+                    if (count > 0) {
+                      hasBadge = true;
+                      badgeValue = `${count}`;
+                    }
+                  } else if (item.id === "pending_actions") {
+                    const count = dynamicOverdueTasksCount;
+                    if (count > 0) {
+                      hasBadge = true;
+                      badgeValue = `${count}`;
+                    }
+                  } else if (item.id === "reports") {
+                    const count = newReportsCount;
+                    if (count > 0) {
+                      hasBadge = true;
+                      badgeValue = `${count}`;
+                    }
+                  } else if (item.id === "discipline") {
+                    const count = newIncidentsCount;
+                    if (count > 0) {
+                      hasBadge = true;
+                      badgeValue = `${count}`;
+                    }
+                  } else if (item.id === "appointments") {
+                    const pendingCount = appointments.filter(a => a.status === "Pending").length;
+                    const notifCount = notifications.length;
+                    const totalBadge = pendingCount + notifCount;
+                    if (totalBadge > 0) {
+                      hasBadge = true;
+                      badgeValue = `${totalBadge} Act`;
+                    }
                   }
 
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setMobileShowCaseDetail(false);
+                      }}
                       className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-bold transition ${
                         isActive
                           ? "bg-[oklch(0.95_0.06_350)] text-duo-pink shadow-xs"
@@ -703,1000 +1837,174 @@ function CounsellorPortal() {
           
           {/* TAB 1: OVERVIEW */}
           {activeTab === "overview" && (
-            <div className="space-y-6 w-full min-w-0">
-              <div>
-                <h1 className="font-display text-3xl font-extrabold tracking-tight">
-                  Mental Wellness Dashboard
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Overview of student well-being records, active cases, and counselling schedule.
-                </p>
-              </div>
-
-              {/* Stat Counters Banner */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { label: "Active Cases", val: activeCasesCount, color: "duo-pink", desc: "Open wellness files", icon: FolderHeart },
-                  { label: "Scheduled Today", val: appointmentsToday, color: "duo-blue", desc: "Wellness checks", icon: Calendar },
-                  { label: "High Risk Flags", val: highRiskStudentsCount, color: "duo-red", desc: "Action required", icon: ShieldAlert },
-                  { label: "Confidential Reports", val: newReportsCount, color: "duo-purple", desc: "Pending review", icon: Inbox },
-                ].map((s) => {
-                  const Icon = s.icon;
-                  return (
-                    <DuoCard key={s.label} className="relative overflow-hidden border border-border p-4 bg-card shadow-xs">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-3xl font-black font-numeric" style={{ color: `var(--${s.color})` }}>
-                            {s.val}
-                          </span>
-                          <h3 className="text-sm font-extrabold text-foreground mt-1">{s.label}</h3>
-                          <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
-                        </div>
-                        <div className="p-2.5 rounded-2xl bg-muted/60">
-                          <Icon className="size-5" style={{ color: `var(--${s.color})` }} />
-                        </div>
-                      </div>
-                    </DuoCard>
-                  );
-                })}
-              </div>
-
-              {/* Quick Action Operations */}
-              <DuoCard className="border border-border p-4">
-                <h2 className="font-display text-lg font-bold mb-3">Quick Actions</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <button
-                    onClick={() => setOpenModal("newCase")}
-                    className="flex flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-4 text-xs font-bold text-center transition hover:-translate-y-0.5 hover:border-duo-pink group"
-                  >
-                    <FolderHeart className="size-6 text-duo-pink group-hover:scale-110 transition" />
-                    Open New Case File
-                  </button>
-                  <button
-                    onClick={() => setOpenModal("newApt")}
-                    className="flex flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-4 text-xs font-bold text-center transition hover:-translate-y-0.5 hover:border-duo-blue group"
-                  >
-                    <Calendar className="size-6 text-duo-blue group-hover:scale-110 transition" />
-                    Book Session
-                  </button>
-                  <button
-                    onClick={() => setOpenModal("newReport")}
-                    className="flex flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-4 text-xs font-bold text-center transition hover:-translate-y-0.5 hover:border-duo-purple group"
-                  >
-                    <Inbox className="size-6 text-duo-purple group-hover:scale-110 transition" />
-                    File Incident Report
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("risk")}
-                    className="flex flex-col items-center gap-2 rounded-2xl border-2 border-border bg-card p-4 text-xs font-bold text-center transition hover:-translate-y-0.5 hover:border-duo-red group"
-                  >
-                    <ShieldAlert className="size-6 text-duo-red group-hover:scale-110 transition" />
-                    Review Risk Indicators
-                  </button>
-                </div>
-              </DuoCard>
-
-              {/* Overview Details Section */}
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Active Appointments for the day */}
-                <DuoCard className="border border-border p-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <h2 className="font-display text-lg font-bold flex items-center gap-2">
-                      <Clock className="size-5 text-duo-blue" /> Scheduled Sessions
-                    </h2>
-                    <button onClick={() => setActiveTab("appointments")} className="text-xs font-bold text-duo-blue hover:underline">
-                      Manage slots →
-                    </button>
-                  </div>
-                  <div className="space-y-3">
-                    {appointments.length === 0 ? (
-                      <p className="text-xs text-muted-foreground p-3 text-center border-2 border-dashed border-border rounded-xl bg-muted/20">
-                        No appointments booked.
-                      </p>
-                    ) : (
-                      appointments.map((apt) => (
-                        <div key={apt.id} className="flex items-center justify-between rounded-xl border border-border p-3 bg-card hover:bg-muted/30">
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{apt.avatar}</span>
-                            <div>
-                              <div className="font-bold text-sm">{apt.studentName}</div>
-                              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                <span>{apt.time}</span> • <span>{apt.type} Session</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <Chip color={apt.status === "Confirmed" ? "blue" : apt.status === "Completed" ? "green" : "white"}>
-                              {apt.status}
-                            </Chip>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </DuoCard>
-
-                {/* Live Activity & Alerts Logs */}
-                <DuoCard className="border border-border p-4">
-                  <h2 className="font-display text-lg font-bold flex items-center gap-2 mb-3">
-                    <Activity className="size-5 text-duo-pink" /> Recent Activities
-                  </h2>
-                  <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-                    <div className="flex items-start gap-2 text-xs">
-                      <span className="mt-0.5 text-duo-pink font-extrabold">●</span>
-                      <div>
-                        <span className="font-semibold text-foreground">Logged checking session</span> for <span className="font-bold">Danish Kumar</span>
-                        <div className="text-[10px] text-muted-foreground mt-0.5">Today 12:30 PM</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2 text-xs">
-                      <span className="mt-0.5 text-duo-purple font-extrabold">●</span>
-                      <div>
-                        <span className="font-semibold text-foreground">Disciplinary referral synced</span> from Cikgu Nadia: <span className="italic">Danish cut math class</span>
-                        <div className="text-[10px] text-muted-foreground mt-0.5">Yesterday 2:45 PM</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2 text-xs">
-                      <span className="mt-0.5 text-duo-green font-extrabold">●</span>
-                      <div>
-                        <span className="font-semibold text-foreground">Confidential report filed</span> by Mrs. Lim regarding <span className="font-bold">Sara Lim</span>
-                        <div className="text-[10px] text-muted-foreground mt-0.5">2 days ago</div>
-                      </div>
-                    </div>
-                  </div>
-                </DuoCard>
-              </div>
-            </div>
+            <DashboardTab
+              students={students}
+              cases={cases}
+              appointments={appointments}
+              riskFactors={riskFactors}
+              reports={reports}
+              disciplineIncidents={disciplineIncidents}
+              showSelfHarmWarnings={showSelfHarmWarnings}
+              setActiveTab={setActiveTab}
+              setActiveSubTab={setActiveSubTab}
+              setSelectedStudentId={setSelectedStudentId}
+              setOpenModal={setOpenModal}
+              setStudentSearchTerm={setStudentSearchTerm}
+              setShowStudentDropdown={setShowStudentDropdown}
+              setNewCaseDraft={setNewCaseDraft}
+              setReportToView={setReportToView}
+              referenceDate={referenceDate}
+              todayDateStr={todayDateStr}
+            />
           )}
 
           {/* TAB 2: STUDENT RECORDS */}
           {activeTab === "records" && (
-            <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] w-full min-w-0">
-              
-              {/* Left Student List Sidebar */}
-              <DuoCard className="hidden lg:block p-4 border border-border bg-card">
-                <div className="relative mb-3">
-                  <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search student..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-2 py-1.5 rounded-xl border border-border text-xs focus:outline-none focus:ring-2 focus:ring-duo-pink bg-muted/40"
-                  />
-                </div>
-                <div className="space-y-1.5 max-h-[480px] overflow-y-auto">
-                  {filteredStudents.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-4">No students found.</p>
-                  ) : (
-                    filteredStudents.map((stud) => {
-                      const activeCase = cases.find((c) => c.studentId === stud.id && c.status === "Active");
-                      return (
-                        <button
-                          key={stud.id}
-                          onClick={() => setSelectedStudentId(stud.id)}
-                          className={`flex w-full items-center gap-2 rounded-xl p-2 text-left text-xs font-semibold transition ${
-                            selectedStudentId === stud.id
-                              ? "bg-[oklch(0.95_0.06_350)] border-l-4 border-duo-pink text-foreground"
-                              : "hover:bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          <span className="text-xl">{stud.avatar}</span>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-foreground truncate">{stud.name}</div>
-                            <div className="text-[10px]">{stud.overall} • {stud.grade}</div>
-                          </div>
-                          {activeCase && (
-                            <span className="size-2 rounded-full bg-duo-pink" />
-                          )}
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              </DuoCard>
-
-              {/* Right Student Details Panel */}
-              <div className="space-y-6 w-full min-w-0">
-                {/* Mobile Student Selector (Visible only below lg size) */}
-                <DuoCard className="block lg:hidden p-4 border border-border bg-card">
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-2">
-                    Select Student
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedStudentId}
-                      onChange={(e) => setSelectedStudentId(e.target.value)}
-                      className="w-full text-xs font-bold bg-muted/40 border border-border rounded-xl p-3 pr-10 appearance-none focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                    >
-                      {students.map((stud) => (
-                        <option key={stud.id} value={stud.id}>
-                          {stud.avatar} {stud.name} ({stud.overall})
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
-                      <ChevronRight className="size-4 rotate-90" />
-                    </div>
-                  </div>
-                </DuoCard>
-
-                <DuoCard className="p-4 sm:p-5 border border-border bg-card">
-                  
-                  {/* Student Header */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-border gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-5xl p-2 rounded-3xl bg-muted/80">{selectedStudent.avatar}</span>
-                      <div>
-                        <h2 className="font-display text-2xl font-black break-words whitespace-normal">{selectedStudent.name}</h2>
-                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                          Class: {selectedStudent.overall} ({selectedStudent.grade})
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs font-bold w-full">
-                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 break-words whitespace-normal">
-                        <span className="text-muted-foreground">Guardian:</span> {selectedStudent.guardian}
-                      </div>
-                      <div className="rounded-xl border border-border bg-muted/40 px-3 py-1.5 break-words whitespace-normal">
-                        <span className="text-muted-foreground">Phone:</span> {selectedStudent.guardianContact}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Summary & Risk Metrics Grid */}
-                  <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_240px] pt-4 min-w-0">
-                    <div className="space-y-4 min-w-0">
-                      <div>
-                        <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide mb-1.5">
-                          Wellness Profile & Psychological Summary
-                        </h3>
-                        <p className="text-sm leading-relaxed p-3 bg-muted/30 rounded-xl border border-border font-medium text-foreground break-words whitespace-normal">
-                          {selectedStudent.wellnessSummary}
-                        </p>
-                      </div>
-
-                      {/* Log Counselling Session Section */}
-                      <div className="border border-pink-100 rounded-2xl bg-[oklch(0.99_0.002_350)] p-4">
-                        <h3 className="text-sm font-bold text-duo-pink flex items-center gap-1.5 mb-3">
-                          <PlusCircle className="size-4" /> Log Counselling Session
-                        </h3>
-                        <form onSubmit={handleAddSession} className="space-y-3">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Session Type</label>
-                              <select
-                                value={sessionDraft.type}
-                                onChange={(e) => setSessionDraft({ ...sessionDraft, type: e.target.value })}
-                                className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                              >
-                                <option>Individual</option>
-                                <option>Group</option>
-                                <option>Parent Consultation</option>
-                                <option>Teacher Consultation</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Progress Index (1-5)</label>
-                              <select
-                                value={sessionDraft.progress}
-                                onChange={(e) => setSessionDraft({ ...sessionDraft, progress: Number(e.target.value) })}
-                                className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                              >
-                                <option value="1">1 - Severe Crisis</option>
-                                <option value="2">2 - High Struggle</option>
-                                <option value="3">3 - Recovering / Neutral</option>
-                                <option value="4">4 - Good Progress</option>
-                                <option value="5">5 - Thriving / Resolved</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Session Summary (Visible to Teachers/Guardians)</label>
-                            <textarea
-                              value={sessionDraft.summary}
-                              onChange={(e) => setSessionDraft({ ...sessionDraft, summary: e.target.value })}
-                              placeholder="Describe counselling progress, coping strategies discussed, and wellness goals..."
-                              rows={2}
-                              className="w-full text-xs bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1">
-                              <Lock className="size-3 text-duo-pink" /> Confidential Private Notes (Counsellor Eyes Only)
-                            </label>
-                            <textarea
-                              value={sessionDraft.privateNotes}
-                              onChange={(e) => setSessionDraft({ ...sessionDraft, privateNotes: e.target.value })}
-                              placeholder="Record psychological assessments, therapeutic details, sensitive child background..."
-                              rows={2}
-                              className="w-full text-xs bg-pink-50/20 border border-pink-100 rounded-xl p-2.5 focus:ring-2 focus:ring-duo-pink focus:outline-none text-foreground font-semibold"
-                            />
-                          </div>
-
-                          <div className="flex justify-end">
-                            <DuoButton type="submit" variant="pink" size="sm">
-                              Log Session Record
-                            </DuoButton>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-
-                    {/* Right Side: Active Case Status & Indicators */}
-                    <div className="space-y-4 min-w-0 w-full">
-                      {/* Active Case Info */}
-                      {(() => {
-                        const activeCase = cases.find((c) => c.studentId === selectedStudent.id && c.status !== "Resolved");
-                        return (
-                          <div className="rounded-xl border border-border p-3.5 bg-card">
-                            <h4 className="text-xs font-extrabold text-muted-foreground uppercase mb-2">Counselling Case File</h4>
-                            {activeCase ? (
-                              <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs font-black text-duo-pink">{activeCase.id}</span>
-                                  <Chip color={activeCase.riskLevel === "High" ? "red" : activeCase.riskLevel === "Medium" ? "orange" : "blue"}>
-                                    {activeCase.riskLevel} Risk
-                                  </Chip>
-                                </div>
-                                <div className="text-xs font-bold">Category: {activeCase.category}</div>
-                                <div className="text-xs font-semibold text-muted-foreground leading-relaxed truncate">{activeCase.summary}</div>
-                                <div className="pt-1 text-[10px] text-muted-foreground font-bold uppercase">
-                                  Open: {activeCase.openDate}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-center py-4">
-                                <p className="text-xs text-muted-foreground">No active case.</p>
-                                <button
-                                  onClick={() => {
-                                    setNewCaseDraft({ ...newCaseDraft, studentId: selectedStudent.id });
-                                    setOpenModal("newCase");
-                                  }}
-                                  className="mt-2 text-xs font-bold text-duo-pink hover:underline"
-                                >
-                                  + Create Case File
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-
-                      {/* Well-being stats/progress */}
-                      <div className="rounded-xl border border-border p-3 bg-muted/20">
-                        <h4 className="text-xs font-extrabold text-muted-foreground uppercase mb-2">Wellness Indexes</h4>
-                        <div className="space-y-3">
-                          {(() => {
-                            const rf = riskFactors[selectedStudent.id] || { academicDrop: 1, withdrawal: 1, outbursts: 1 };
-                            return (
-                              <>
-                                <DuoProgress label="Academic Engagement" value={100 - rf.academicDrop * 20} color="green" />
-                                <DuoProgress label="Social Interactivity" value={100 - rf.withdrawal * 20} color="blue" />
-                                <DuoProgress label="Emotional Regulation" value={100 - rf.outbursts * 20} color="purple" />
-                              </>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Session Logs History */}
-                  <div className="mt-6 border-t border-border pt-4">
-                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide mb-3">
-                      Session Logs & Case Timeline
-                    </h3>
-                    <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                      {!selectedStudent.sessions || selectedStudent.sessions.length === 0 ? (
-                        <p className="text-xs text-muted-foreground p-3 text-center border-2 border-dashed border-border rounded-xl">
-                          No logged counselling session records found.
-                        </p>
-                      ) : (
-                        selectedStudent.sessions.map((sess: any) => (
-                          <div key={sess.id} className="rounded-xl border border-border p-3.5 bg-card">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 pb-1.5 border-b border-muted">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="rounded-md bg-pink-100 text-duo-pink px-2 py-0.5 text-[10px] font-extrabold uppercase">
-                                  {sess.type}
-                                </span>
-                                <span className="text-[11px] text-muted-foreground font-bold">{sess.date}</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-xs">
-                                <span className="text-muted-foreground font-bold">Progress index:</span>
-                                <Chip color={sess.progress >= 4 ? "green" : sess.progress === 3 ? "yellow" : "red"}>
-                                  ★ {sess.progress} / 5
-                                </Chip>
-                              </div>
-                            </div>
-                            <div className="text-xs font-bold text-foreground break-words whitespace-normal">{sess.summary}</div>
-                            {sess.privateNotes && (
-                              <div className="mt-2 text-xs bg-pink-50/30 border-l-2 border-duo-pink pl-2.5 py-1 text-foreground/80 italic font-semibold flex items-start gap-1">
-                                <Lock className="size-3 text-duo-pink shrink-0 mt-0.5" />
-                                <span className="break-words whitespace-normal">Confidential notes: {sess.privateNotes}</span>
-                              </div>
-                            )}
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                </DuoCard>
-              </div>
-
-            </div>
+            <StudentRecordsTab
+              students={students}
+              selectedStudentId={selectedStudentId}
+              setSelectedStudentId={setSelectedStudentId}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              riskFilter={riskFilter}
+              setRiskFilter={setRiskFilter}
+              issueFilter={issueFilter}
+              setIssueFilter={setIssueFilter}
+              activeSubTab={activeSubTab}
+              setActiveSubTab={setActiveSubTab}
+              filteredStudents={filteredStudents}
+              cases={cases}
+              saveState={saveState}
+              handleToggleTaskStatus={handleToggleTaskStatus}
+            />
           )}
 
-          {/* TAB 3: CASE MANAGEMENT */}
+          {/* TAB 3: CASE MANAGER */}
           {activeTab === "cases" && (
-            <div className="space-y-6 w-full min-w-0">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h1 className="font-display text-2xl font-extrabold">Confidential Case Files</h1>
-                  <p className="text-xs text-muted-foreground">Manage active, observation, and resolved case records.</p>
-                </div>
-                <DuoButton variant="pink" size="sm" onClick={() => setOpenModal("newCase")}>
-                  <Plus className="size-4" /> Open New Case
-                </DuoButton>
-              </div>
-
-              {/* Case status boards */}
-              <div className="grid gap-4 md:grid-cols-4">
-                {["Active", "Observation", "Resolved", "Referred"].map((status) => {
-                  const statusCases = cases.filter((c) => c.status === status);
-                  const statusColors: Record<string, string> = {
-                    Active: "border-duo-pink bg-pink-50/20 text-duo-pink",
-                    Observation: "border-duo-orange bg-orange-50/20 text-duo-orange",
-                    Resolved: "border-duo-green bg-green-50/20 text-duo-green-dark",
-                    Referred: "border-duo-blue bg-blue-50/20 text-duo-blue",
-                  };
-
-                  return (
-                    <div key={status} className="rounded-2xl border border-border p-3.5 bg-card space-y-3">
-                      <div className={`flex items-center justify-between rounded-xl border p-2 text-xs font-bold uppercase tracking-wider ${statusColors[status]}`}>
-                        <span>{status} Cases</span>
-                        <span className="rounded-full bg-foreground/10 px-2 py-0.5">{statusCases.length}</span>
-                      </div>
-                      
-                      <div className="space-y-2.5 max-h-[440px] overflow-y-auto">
-                        {statusCases.length === 0 ? (
-                          <div className="text-center py-8 border-2 border-dashed border-border rounded-xl text-xs text-muted-foreground">
-                            No cases in this state.
-                          </div>
-                        ) : (
-                          statusCases.map((c) => (
-                            <div key={c.id} className="card-pop p-3 border border-border bg-card space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-black text-duo-pink">{c.id}</span>
-                                <Chip color={c.riskLevel === "High" ? "red" : c.riskLevel === "Medium" ? "orange" : "blue"}>
-                                  {c.riskLevel}
-                                </Chip>
-                              </div>
-
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-lg">{c.avatar}</span>
-                                <span className="font-bold text-xs">{c.studentName}</span>
-                              </div>
-
-                              <div className="text-[11px] font-bold text-foreground leading-normal line-clamp-2">
-                                {c.summary}
-                              </div>
-
-                              <div className="pt-1.5 border-t border-muted flex flex-col gap-1.5 text-[10px]">
-                                <div className="flex justify-between text-muted-foreground font-bold">
-                                  <span>Category:</span>
-                                  <span className="text-foreground">{c.category}</span>
-                                </div>
-                                <div className="flex justify-between text-muted-foreground font-bold">
-                                  <span>Last Session:</span>
-                                  <span className="text-foreground">{c.lastSessionDate}</span>
-                                </div>
-                              </div>
-
-                              {/* Action controls */}
-                              <div className="flex justify-between gap-1 pt-1">
-                                <select
-                                  value={c.status}
-                                  onChange={(e) => handleUpdateCaseStatus(c.id, e.target.value)}
-                                  className="w-full text-[10px] bg-muted/60 border border-border rounded-lg p-1 font-bold"
-                                >
-                                  <option value="Active">Active</option>
-                                  <option value="Observation">Observe</option>
-                                  <option value="Resolved">Resolve</option>
-                                  <option value="Referred">Refer</option>
-                                </select>
-                                <select
-                                  value={c.riskLevel}
-                                  onChange={(e) => handleUpdateCaseRisk(c.id, e.target.value as any)}
-                                  className="w-full text-[10px] bg-muted/60 border border-border rounded-lg p-1 font-bold"
-                                >
-                                  <option value="Low">Low</option>
-                                  <option value="Medium">Medium</option>
-                                  <option value="High">High</option>
-                                </select>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <CaseManagerTab
+              cases={cases}
+              students={students}
+              selectedCaseId={selectedCaseId}
+              setSelectedCaseId={setSelectedCaseId}
+              caseSearch={caseSearch}
+              setCaseSearch={setCaseSearch}
+              caseStatusFilter={caseStatusFilter}
+              setCaseStatusFilter={setCaseStatusFilter}
+              caseRiskFilter={caseRiskFilter}
+              setCaseRiskFilter={setCaseRiskFilter}
+              mobileShowCaseDetail={mobileShowCaseDetail}
+              setMobileShowCaseDetail={setMobileShowCaseDetail}
+              getTimelineEvents={getTimelineEvents}
+              setEditCaseDraft={setEditCaseDraft}
+              setScheduleAptDraft={setScheduleAptDraft}
+              setOpenModal={setOpenModal}
+              setSelectedStudentId={setSelectedStudentId}
+              setActiveSubTab={setActiveSubTab}
+              setActiveTab={setActiveTab}
+              setCloseCaseNotesDraft={setCloseCaseNotesDraft}
+              setNewCaseDraft={setNewCaseDraft}
+            />
           )}
 
-          {/* TAB 4: APPOINTMENT SCHEDULING */}
+          {/* TAB 4: APPOINTMENTS */}
           {activeTab === "appointments" && (
-            <div className="space-y-6 w-full min-w-0">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h1 className="font-display text-2xl font-extrabold">Appointment Scheduling</h1>
-                  <p className="text-xs text-muted-foreground">Book and manage wellness assessment checks.</p>
-                </div>
-                <DuoButton variant="blue" size="sm" onClick={() => setOpenModal("newApt")}>
-                  <Plus className="size-4" /> Book New Session
-                </DuoButton>
-              </div>
-
-              <DuoCard className="p-4 border border-border bg-card">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted text-[11px] uppercase text-muted-foreground">
-                      <tr>
-                        <th className="px-4 py-2.5 text-left">Student</th>
-                        <th className="px-4 py-2.5 text-left">Date</th>
-                        <th className="px-4 py-2.5 text-left">Time Slot</th>
-                        <th className="px-4 py-2.5 text-left">Session Type</th>
-                        <th className="px-4 py-2.5 text-center">Status</th>
-                        <th className="px-4 py-2.5 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {appointments.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="text-center py-6 text-xs text-muted-foreground">
-                            No appointments listed.
-                          </td>
-                        </tr>
-                      ) : (
-                        appointments.map((apt) => (
-                          <tr key={apt.id} className="hover:bg-muted/10 font-medium">
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg">{apt.avatar}</span>
-                                <span className="font-bold text-xs">{apt.studentName}</span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-xs">{apt.date}</td>
-                            <td className="px-4 py-3 text-xs">{apt.time}</td>
-                            <td className="px-4 py-3 text-xs font-bold text-duo-purple">{apt.type}</td>
-                            <td className="px-4 py-3 text-center">
-                              <Chip color={apt.status === "Confirmed" ? "blue" : apt.status === "Completed" ? "green" : apt.status === "Cancelled" ? "red" : "white"}>
-                                {apt.status}
-                              </Chip>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                              <div className="flex flex-col sm:flex-row gap-1 justify-center items-center">
-                                {apt.status === "Pending" && (
-                                  <button
-                                    onClick={() => handleToggleAptStatus(apt.id, "Confirmed")}
-                                    className="p-1 text-xs font-bold bg-duo-blue text-white rounded-md hover:opacity-90"
-                                  >
-                                    Confirm
-                                  </button>
-                                )}
-                                {apt.status === "Confirmed" && (
-                                  <button
-                                    onClick={() => {
-                                      handleToggleAptStatus(apt.id, "Completed");
-                                      setSelectedStudentId(apt.studentId);
-                                      setActiveTab("records");
-                                    }}
-                                    className="p-1.5 text-xs font-bold bg-duo-green text-white rounded-lg hover:opacity-90 flex items-center gap-1"
-                                  >
-                                    Complete & Log
-                                  </button>
-                                )}
-                                {apt.status !== "Cancelled" && apt.status !== "Completed" && (
-                                  <button
-                                    onClick={() => handleToggleAptStatus(apt.id, "Cancelled")}
-                                    className="p-1 px-1.5 text-xs font-bold bg-duo-red text-white rounded-lg hover:opacity-90"
-                                  >
-                                    Cancel
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </DuoCard>
-            </div>
+            <AppointmentsTab
+              appointments={appointments}
+              selectedAptDate={selectedAptDate}
+              setSelectedAptDate={setSelectedAptDate}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              aptCounselorFilter={aptCounselorFilter}
+              setAptCounselorFilter={setAptCounselorFilter}
+              aptTypeFilter={aptTypeFilter}
+              setAptTypeFilter={setAptTypeFilter}
+              aptMonthFilter={aptMonthFilter}
+              setAptMonthFilter={setAptMonthFilter}
+              setSelectedAptId={setSelectedAptId}
+              setOpenModal={setOpenModal}
+              notifications={notifications}
+              saveState={saveState}
+            />
           )}
 
-          {/* TAB 5: RISK & BEHAVIOUR TRACKING */}
+          {/* TAB 5: RISK TRACKING */}
           {activeTab === "risk" && (
-            <div className="space-y-6 w-full min-w-0">
-              <div>
-                <h1 className="font-display text-2xl font-extrabold flex items-center gap-2">
-                  <ShieldAlert className="size-6 text-duo-red animate-pulse" /> Wellness Risk Indicators
-                </h1>
-                <p className="text-xs text-muted-foreground">Monitor student distress indices and toggle self-harm warnings.</p>
-              </div>
-
-              <DuoCard className="p-4 border border-border bg-card">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted text-[11px] uppercase text-muted-foreground">
-                      <tr>
-                        <th className="px-4 py-2.5 text-left">Student</th>
-                        <th className="px-4 py-2.5 text-center">Academic Drop</th>
-                        <th className="px-4 py-2.5 text-center">Social Withdrawal</th>
-                        <th className="px-4 py-2.5 text-center">Emotional Outbursts</th>
-                        <th className="px-4 py-2.5 text-center">Self-Harm alert</th>
-                        <th className="px-4 py-2.5 text-center">Overall Risk</th>
-                        <th className="px-4 py-2.5 text-center">Last Updated</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {students.map((stud) => {
-                        const rf = riskFactors[stud.id] || { academicDrop: 1, withdrawal: 1, outbursts: 1, selfHarmAlert: false, lastUpdated: "None" };
-                        
-                        // Calculate score
-                        const maxIndex = Math.max(rf.academicDrop, rf.withdrawal, rf.outbursts);
-                        let finalRisk: "Low" | "Medium" | "High" = "Low";
-                        if (rf.selfHarmAlert || maxIndex >= 4) finalRisk = "High";
-                        else if (maxIndex >= 3) finalRisk = "Medium";
-
-                        return (
-                          <tr key={stud.id} className="hover:bg-muted/10 font-medium">
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg">{stud.avatar}</span>
-                                <span className="font-bold text-xs">{stud.name}</span>
-                              </div>
-                            </td>
-                            {/* Academic Drop */}
-                            <td className="px-4 py-3 text-center">
-                              <div className="inline-flex gap-1">
-                                {[1, 2, 3, 4, 5].map((idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => handleUpdateRiskFactor(stud.id, "academicDrop", idx)}
-                                    className={`size-5 rounded-md text-[10px] font-black ${
-                                      rf.academicDrop >= idx
-                                        ? idx >= 4
-                                          ? "bg-duo-red text-white"
-                                          : idx >= 3
-                                            ? "bg-duo-orange text-white"
-                                            : "bg-duo-green text-white"
-                                        : "bg-muted text-muted-foreground border border-border"
-                                    }`}
-                                  >
-                                    {idx}
-                                  </button>
-                                ))}
-                              </div>
-                            </td>
-                            {/* Social Withdrawal */}
-                            <td className="px-4 py-3 text-center">
-                              <div className="inline-flex gap-1">
-                                {[1, 2, 3, 4, 5].map((idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => handleUpdateRiskFactor(stud.id, "withdrawal", idx)}
-                                    className={`size-5 rounded-md text-[10px] font-black ${
-                                      rf.withdrawal >= idx
-                                        ? idx >= 4
-                                          ? "bg-duo-red text-white"
-                                          : idx >= 3
-                                            ? "bg-duo-orange text-white"
-                                            : "bg-duo-green text-white"
-                                        : "bg-muted text-muted-foreground border border-border"
-                                    }`}
-                                  >
-                                    {idx}
-                                  </button>
-                                ))}
-                              </div>
-                            </td>
-                            {/* Emotional Outbursts */}
-                            <td className="px-4 py-3 text-center">
-                              <div className="inline-flex gap-1">
-                                {[1, 2, 3, 4, 5].map((idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => handleUpdateRiskFactor(stud.id, "outbursts", idx)}
-                                    className={`size-5 rounded-md text-[10px] font-black ${
-                                      rf.outbursts >= idx
-                                        ? idx >= 4
-                                          ? "bg-duo-red text-white"
-                                          : idx >= 3
-                                            ? "bg-duo-orange text-white"
-                                            : "bg-duo-green text-white"
-                                        : "bg-muted text-muted-foreground border border-border"
-                                    }`}
-                                  >
-                                    {idx}
-                                  </button>
-                                ))}
-                              </div>
-                            </td>
-                            {/* Self harm alert */}
-                            <td className="px-4 py-3 text-center">
-                              <button
-                                onClick={() => handleToggleSelfHarm(stud.id)}
-                                className={`p-1 px-2.5 rounded-xl text-[10px] font-extrabold uppercase transition ${
-                                  rf.selfHarmAlert
-                                    ? "bg-duo-red text-white animate-pulse"
-                                    : "bg-muted text-muted-foreground border border-border"
-                                }`}
-                              >
-                                {rf.selfHarmAlert ? "⚠️ Alert Active" : "No Report"}
-                              </button>
-                            </td>
-                            {/* Final risk */}
-                            <td className="px-4 py-3 text-center">
-                              <Chip color={finalRisk === "High" ? "red" : finalRisk === "Medium" ? "orange" : "green"}>
-                                {finalRisk} Risk
-                              </Chip>
-                            </td>
-                            <td className="px-4 py-3 text-center text-xs text-muted-foreground">{rf.lastUpdated}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </DuoCard>
-            </div>
+            <RiskTrackingTab
+              students={students}
+              riskFactors={riskFactors}
+              showSelfHarmWarnings={showSelfHarmWarnings}
+              setShowSelfHarmWarnings={setShowSelfHarmWarnings}
+              riskSearchQuery={riskSearchQuery}
+              setRiskSearchQuery={setRiskSearchQuery}
+              riskLevelFilter={riskLevelFilter}
+              setRiskLevelFilter={setRiskLevelFilter}
+              riskSortBy={riskSortBy}
+              setRiskSortBy={setRiskSortBy}
+              setSelectedStudentId={setSelectedStudentId}
+              setActiveTab={setActiveTab}
+              handleUpdateRiskFactor={handleUpdateRiskFactor}
+              handleToggleSelfHarm={handleToggleSelfHarm}
+            />
           )}
 
-          {/* TAB 6: CONFIDENTIAL REPORTS */}
+          {/* TAB 6: CONFIDENTIAL REPORTS INBOX */}
           {activeTab === "reports" && (
-            <div className="space-y-6 w-full min-w-0">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h1 className="font-display text-2xl font-extrabold">Confidential Reports Inbox</h1>
-                  <p className="text-xs text-muted-foreground">Assess well-being concerns submitted by teachers or parents.</p>
-                </div>
-                <DuoButton variant="purple" size="sm" onClick={() => setOpenModal("newReport")}>
-                  <Plus className="size-4" /> File New Report
-                </DuoButton>
-              </div>
-
-              <div className="space-y-4">
-                {reports.filter(r => r.status === "New").length === 0 ? (
-                  <DuoCard className="p-8 border border-border bg-card text-center">
-                    <CheckCircle className="size-10 text-duo-green mx-auto mb-2" />
-                    <h2 className="font-display text-lg font-bold">Inbox is Clear!</h2>
-                    <p className="text-xs text-muted-foreground">No new confidential reports require review at this time.</p>
-                    {reports.length > 0 && (
-                      <button
-                        onClick={() => saveState({ reports: DEFAULT_REPORTS })}
-                        className="mt-3 text-xs font-bold text-duo-pink hover:underline"
-                      >
-                        Reset Mock Reports list
-                      </button>
-                    )}
-                  </DuoCard>
-                ) : (
-                  reports.filter((r) => r.status === "New").map((rep) => (
-                    <DuoCard key={rep.id} className="p-4 border border-border bg-card relative overflow-hidden">
-                      <div className="absolute top-0 left-0 w-2.5 h-full bg-duo-purple" />
-                      
-                      <div className="flex justify-between items-start mb-2 pl-2">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-duo-purple">{rep.id}</span>
-                            <Chip color={rep.urgency === "Urgent" || rep.urgency === "High" ? "red" : "white"}>
-                              {rep.urgency} Urgency
-                            </Chip>
-                          </div>
-                          <div className="text-xs text-muted-foreground font-bold mt-1">
-                            Logged by: <span className="text-foreground">{rep.reporterName} ({rep.reporterRole})</span> • {rep.date}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-xs font-bold text-muted-foreground uppercase">Concern Student:</span>
-                          <div className="font-extrabold text-sm text-foreground">{rep.studentName}</div>
-                        </div>
-                      </div>
-
-                      <div className="pl-2 py-2 text-xs leading-relaxed font-semibold text-foreground bg-muted/30 rounded-xl border border-border mb-3">
-                        {rep.description}
-                      </div>
-
-                      <div className="pl-2 flex justify-end gap-2">
-                        <button
-                          onClick={() => handleDismissReport(rep.id)}
-                          className="px-3 py-1.5 text-xs font-bold bg-muted border border-border rounded-xl text-muted-foreground hover:bg-muted/80 transition"
-                        >
-                          Dismiss
-                        </button>
-                        <DuoButton
-                          variant="purple"
-                          size="sm"
-                          onClick={() => handleFileReport(rep)}
-                        >
-                          File as Active Case File
-                        </DuoButton>
-                      </div>
-                    </DuoCard>
-                  ))
-                )}
-
-                {/* Filed or Archive reports toggle/list */}
-                {reports.filter((r) => r.status !== "New").length > 0 && (
-                  <DuoCard className="p-4 border border-border bg-card">
-                    <h3 className="text-xs font-black text-muted-foreground uppercase mb-3">Processed Reports Log</h3>
-                    <div className="space-y-2.5">
-                      {reports.filter((r) => r.status !== "New").map((rep) => (
-                        <div key={rep.id} className="flex justify-between items-center text-xs p-2.5 border border-border bg-muted/10 rounded-xl">
-                          <div>
-                            <span className="font-bold text-foreground">{rep.studentName}</span>
-                            <span className="text-muted-foreground ml-1.5">Concern submitted by {rep.reporterName}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-muted-foreground">{rep.date}</span>
-                            <Chip color={rep.status === "Filed as Case" ? "pink" : "white"}>
-                              {rep.status}
-                            </Chip>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </DuoCard>
-                )}
-              </div>
-            </div>
+            <InboxReportsTab
+              reports={reports}
+              reportSearchQuery={reportSearchQuery}
+              setReportSearchQuery={setReportSearchQuery}
+              handleDismissReport={handleDismissReport}
+              handleFileReport={handleFileReport}
+              setReportToView={setReportToView}
+              setNewReportStudentSearch={setNewReportStudentSearch}
+              setNewReportShowDropdown={setNewReportShowDropdown}
+              setNewReportDraft={setNewReportDraft}
+              setOpenModal={setOpenModal}
+            />
           )}
 
-          {/* TAB 7: DISCIPLINE MODULE INTEGRATION */}
+          {/* TAB 7: DISCIPLINE SYNC */}
           {activeTab === "discipline" && (
-            <div className="space-y-6 w-full min-w-0">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h1 className="font-display text-2xl font-extrabold flex items-center gap-2">
-                    <AlertOctagon className="size-6 text-duo-orange" /> Discipline Module Referral Sync
-                  </h1>
-                  <p className="text-xs text-muted-foreground">
-                    Seamlessly review teacher demerits and sync students with behavioural incidents to counselling check-ins.
-                  </p>
-                </div>
-                <div className="rounded-xl border border-orange-100 bg-orange-50/20 px-3 py-1.5 text-xs font-semibold text-duo-orange flex items-center gap-1.5">
-                  <Activity className="size-3.5" />
-                  <span>Real-time Sync Active</span>
-                </div>
-              </div>
+            <DisciplineSyncTab
+              cases={cases}
+              disciplineIncidents={disciplineIncidents}
+              students={students}
+              selectedIncidentId={selectedIncidentId}
+              setSelectedIncidentId={setSelectedIncidentId}
+              disciplineSearchQuery={disciplineSearchQuery}
+              setDisciplineSearchQuery={setDisciplineSearchQuery}
+              disciplineStatusFilter={disciplineStatusFilter}
+              setDisciplineStatusFilter={setDisciplineStatusFilter}
+              disciplineTypeFilter={disciplineTypeFilter}
+              setDisciplineTypeFilter={setDisciplineTypeFilter}
+              disciplineGradeFilter={disciplineGradeFilter}
+              setDisciplineGradeFilter={setDisciplineGradeFilter}
+              linkCaseSearch={linkCaseSearch}
+              setLinkCaseSearch={setLinkCaseSearch}
+              showLinkCaseDropdown={showLinkCaseDropdown}
+              setShowLinkCaseDropdown={setShowLinkCaseDropdown}
+              handleLinkIncidentToCase={handleLinkIncidentToCase}
+              handleCreateCaseFromIncident={handleCreateCaseFromIncident}
+              setIncidentToReview={setIncidentToReview}
+              handleViewStudentRecord={handleViewStudentRecord}
+              setActiveTab={setActiveTab}
+              setSelectedCaseId={setSelectedCaseId}
+              setMobileShowCaseDetail={setMobileShowCaseDetail}
+            />
+          )}
 
-              {/* Discipline and incidents tracking */}
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-                <DuoCard className="p-4 border border-border bg-card space-y-4">
-                  <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Disciplinary Incidents Inbox</h2>
-                  <div className="space-y-3">
-                    {disciplineIncidents.map((incident) => {
-                      const isLinked = incident.counsellingCaseId !== null;
-                      return (
-                        <div key={incident.id} className="border border-border rounded-xl p-3.5 bg-card relative overflow-hidden flex flex-col gap-2">
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{incident.avatar}</span>
-                              <div>
-                                <span className="font-bold text-xs">{incident.studentName}</span>
-                                <div className="text-[10px] text-muted-foreground">Logged: {incident.date} by {incident.loggedBy}</div>
-                              </div>
-                            </div>
-                            <Chip color={incident.disciplineStatus === "Referred to Counselling" ? "pink" : incident.disciplineStatus === "Action Taken" ? "green" : "orange"}>
-                              {incident.disciplineStatus}
-                            </Chip>
-                          </div>
-
-                          <div className="text-xs font-semibold text-foreground/90 leading-relaxed bg-muted/40 p-2.5 rounded-xl border border-border">
-                            {incident.infraction}
-                          </div>
-
-                          {/* Intervention Note Input */}
-                          <div className="mt-1 pt-2 border-t border-muted">
-                            {isLinked ? (
-                              <div className="text-[11px] font-bold text-duo-pink flex items-center gap-1 bg-pink-50/20 p-2 rounded-lg border border-pink-100">
-                                <BookmarkCheck className="size-3.5" />
-                                <span>Linked to Wellness Case: {incident.counsellingCaseId}</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleIntakeDiscipline(incident)}
-                                  className="px-2.5 py-1 text-[11px] font-bold bg-duo-pink text-white rounded-lg hover:opacity-90 transition shrink-0"
-                                >
-                                  Intake to Counselling
-                                </button>
-                                <span className="text-[10px] text-muted-foreground">or add counselling feedback:</span>
-                              </div>
-                            )}
-
-                            {/* Counselling intervention response comments */}
-                            <form
-                              onSubmit={(e) => {
-                                e.preventDefault();
-                                const fd = new FormData(e.currentTarget);
-                                const notes = fd.get("notes") as string;
-                                handleSaveDisciplineIntervention(incident.id, notes);
-                                e.currentTarget.reset();
-                              }}
-                              className="mt-2 flex gap-1.5"
-                            >
-                              <input
-                                name="notes"
-                                defaultValue={incident.interventionNotes || ""}
-                                placeholder={isLinked ? "Append counselling follow-up notes..." : "Add de-escalation intervention notes..."}
-                                className="flex-1 text-[11px] border border-border bg-card rounded-lg px-2 py-1 focus:ring-1 focus:ring-duo-orange focus:outline-none"
-                              />
-                              <button
-                                type="submit"
-                                className="p-1 px-2.5 text-[11px] font-bold bg-duo-orange text-white rounded-lg hover:opacity-90 shrink-0"
-                              >
-                                Save Note
-                              </button>
-                            </form>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </DuoCard>
-
-                {/* Right side analytics/discipline overview */}
-                <div className="space-y-4">
-                  <DuoCard className="border border-border p-4 bg-card">
-                    <h3 className="text-xs font-black text-muted-foreground uppercase mb-2">Discipline Referral Stat</h3>
-                    <div className="space-y-3.5">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-semibold text-muted-foreground">Total Referred to Counselling</span>
-                        <span className="font-bold text-duo-pink">
-                          {disciplineIncidents.filter((i) => i.counsellingReferral).length}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-semibold text-muted-foreground">Active Counselling Cases Linked</span>
-                        <span className="font-bold text-duo-purple">
-                          {cases.filter((c) => c.category === "Behavioral").length}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-semibold text-muted-foreground">Incidents Cleared via Intervention</span>
-                        <span className="font-bold text-duo-green-dark">
-                          {disciplineIncidents.filter((i) => i.disciplineStatus === "Action Taken").length}
-                        </span>
-                      </div>
-
-                      <div className="border-t border-muted pt-3">
-                        <div className="text-xs font-bold text-foreground mb-1.5 flex items-center gap-1">
-                          <Heart className="size-3.5 text-duo-pink" /> Intervention Success Rate
-                        </div>
-                        <DuoProgress label="De-escalation progress" value={78} color="pink" />
-                      </div>
-                    </div>
-                  </DuoCard>
-                  
-                  <DuoCard className="border border-border p-4 bg-[oklch(0.96_0.02_250)] text-xs text-muted-foreground space-y-2.5">
-                    <div className="font-bold text-foreground flex items-center gap-1.5">
-                      <ExternalLink className="size-3.5" /> Discipline Integration
-                    </div>
-                    <p className="leading-relaxed">
-                      This sync allows the school counsellor to immediately review infractions filed by teachers in the classroom and convert them into counselling cases, addressing behavioural concerns with proactive therapy rather than just demerits.
-                    </p>
-                  </DuoCard>
-                </div>
-              </div>
-            </div>
+          {/* TAB 8: PENDING ACTIONS */}
+          {activeTab === "pending_actions" && (
+            <PendingActionsTab
+              students={students}
+              taskSearchQuery={taskSearchQuery}
+              setTaskSearchQuery={setTaskSearchQuery}
+              taskFilter={taskFilter}
+              setTaskFilter={setTaskFilter}
+              handleToggleTaskStatusGlobal={handleToggleTaskStatusGlobal}
+              handleViewStudentRecord={handleViewStudentRecord}
+              todayDateStr={todayDateStr}
+            />
           )}
 
 
@@ -1708,260 +2016,94 @@ function CounsellorPortal() {
       {/* ============================================================ */}
       
       {/* Modal 1: Open New Case */}
+      {/* Modals Container */}
       {openModal === "newCase" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-          <div className="bg-card w-full max-w-md rounded-2xl border-2 border-border p-5 shadow-2xl animate-pop-in">
-            <div className="flex justify-between items-center pb-3 border-b border-border">
-              <h2 className="font-display text-lg font-bold flex items-center gap-1.5 text-duo-pink">
-                <FolderHeart className="size-5" /> Open Counselling Case File
-              </h2>
-              <button onClick={() => setOpenModal(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">✕</button>
-            </div>
-            
-            <form onSubmit={handleCreateCase} className="mt-3.5 space-y-3.5">
-              <div>
-                <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Student</label>
-                <select
-                  value={newCaseDraft.studentId}
-                  onChange={(e) => setNewCaseDraft({ ...newCaseDraft, studentId: e.target.value })}
-                  className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                >
-                  {students.map(s => (
-                    <option key={s.id} value={s.id}>{s.avatar} {s.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Category</label>
-                  <select
-                    value={newCaseDraft.category}
-                    onChange={(e) => setNewCaseDraft({ ...newCaseDraft, category: e.target.value })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                  >
-                    <option>Academic Stress</option>
-                    <option>Emotional Regulation</option>
-                    <option>Peer Conflict</option>
-                    <option>Family Issues</option>
-                    <option>Behavioral</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Risk Level</label>
-                  <select
-                    value={newCaseDraft.riskLevel}
-                    onChange={(e) => setNewCaseDraft({ ...newCaseDraft, riskLevel: e.target.value })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                  >
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Case Brief Summary</label>
-                <textarea
-                  required
-                  value={newCaseDraft.summary}
-                  onChange={(e) => setNewCaseDraft({ ...newCaseDraft, summary: e.target.value })}
-                  placeholder="Summarize the primary concern, referral cause, and action plan..."
-                  rows={3}
-                  className="w-full text-xs bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-pink focus:outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => setOpenModal(null)}
-                  className="px-4 py-2 text-xs font-bold bg-muted border border-border rounded-xl hover:bg-muted/80 text-muted-foreground transition"
-                >
-                  Cancel
-                </button>
-                <DuoButton type="submit" variant="pink" size="sm">
-                  Create Case File
-                </DuoButton>
-              </div>
-            </form>
-          </div>
-        </div>
+        <NewCaseModal
+          setOpenModal={setOpenModal}
+          handleCreateCase={handleCreateCase}
+          students={students}
+          newCaseDraft={newCaseDraft}
+          setNewCaseDraft={setNewCaseDraft}
+        />
       )}
 
-      {/* Modal 2: Book Appointment */}
-      {openModal === "newApt" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-          <div className="bg-card w-full max-w-md rounded-2xl border-2 border-border p-5 shadow-2xl animate-pop-in">
-            <div className="flex justify-between items-center pb-3 border-b border-border">
-              <h2 className="font-display text-lg font-bold flex items-center gap-1.5 text-duo-blue">
-                <Calendar className="size-5" /> Schedule Session
-              </h2>
-              <button onClick={() => setOpenModal(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">✕</button>
-            </div>
-
-            <form onSubmit={handleCreateAppointment} className="mt-3.5 space-y-3.5">
-              <div>
-                <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Select Student</label>
-                <select
-                  value={newAptDraft.studentId}
-                  onChange={(e) => setNewAptDraft({ ...newAptDraft, studentId: e.target.value })}
-                  className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-blue focus:outline-none"
-                >
-                  {students.map(s => (
-                    <option key={s.id} value={s.id}>{s.avatar} {s.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={newAptDraft.date}
-                    onChange={(e) => setNewAptDraft({ ...newAptDraft, date: e.target.value })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-blue focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Time Slot</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. 10:00 AM"
-                    value={newAptDraft.time}
-                    onChange={(e) => setNewAptDraft({ ...newAptDraft, time: e.target.value })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-blue focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Session Type</label>
-                <select
-                  value={newAptDraft.type}
-                  onChange={(e) => setNewAptDraft({ ...newAptDraft, type: e.target.value })}
-                  className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-blue focus:outline-none"
-                >
-                  <option>Individual</option>
-                  <option>Group</option>
-                  <option>Parent Consultation</option>
-                  <option>Teacher Consultation</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => setOpenModal(null)}
-                  className="px-4 py-2 text-xs font-bold bg-muted border border-border rounded-xl hover:bg-muted/80 text-muted-foreground transition"
-                >
-                  Cancel
-                </button>
-                <DuoButton type="submit" variant="blue" size="sm">
-                  Schedule Slot
-                </DuoButton>
-              </div>
-            </form>
-          </div>
-        </div>
+      {openModal === "editCase" && editCaseDraft && (
+        <EditCaseModal
+          setOpenModal={setOpenModal}
+          editCaseDraft={editCaseDraft}
+          setEditCaseDraft={setEditCaseDraft}
+          handleUpdateCase={handleUpdateCase}
+        />
       )}
 
-      {/* Modal 3: File Incident Report */}
+      {openModal === "scheduleSession" && (
+        <ScheduleSessionModal
+          setOpenModal={setOpenModal}
+          handleScheduleCaseSession={handleScheduleCaseSession}
+          cases={cases}
+          selectedCaseId={selectedCaseId}
+          scheduleAptDraft={scheduleAptDraft}
+          setScheduleAptDraft={setScheduleAptDraft}
+        />
+      )}
+
+      {openModal === "closeCase" && (
+        <CloseCaseModal
+          setOpenModal={setOpenModal}
+          closeCaseNotesDraft={closeCaseNotesDraft}
+          setCloseCaseNotesDraft={setCloseCaseNotesDraft}
+          selectedCaseId={selectedCaseId}
+          handleCloseCase={handleCloseCase}
+          setCaseStatusFilter={setCaseStatusFilter}
+        />
+      )}
+
+      {openModal === "viewApt" && (
+        <ViewAptModal
+          setOpenModal={setOpenModal}
+          selectedAptId={selectedAptId}
+          appointments={appointments}
+          rescheduleDraft={rescheduleDraft}
+          setRescheduleDraft={setRescheduleDraft}
+          handleRescheduleAppointment={handleRescheduleAppointment}
+          handleCancelAppointment={handleCancelAppointment}
+          handleToggleAptStatus={handleToggleAptStatus}
+          setSelectedStudentId={setSelectedStudentId}
+          setActiveTab={setActiveTab}
+        />
+      )}
+
       {openModal === "newReport" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-          <div className="bg-card w-full max-w-md rounded-2xl border-2 border-border p-5 shadow-2xl animate-pop-in">
-            <div className="flex justify-between items-center pb-3 border-b border-border">
-              <h2 className="font-display text-lg font-bold flex items-center gap-1.5 text-duo-purple">
-                <Inbox className="size-5" /> File Confidential Report
-              </h2>
-              <button onClick={() => setOpenModal(null)} className="text-muted-foreground hover:text-foreground text-sm font-bold">✕</button>
-            </div>
+        <NewReportModal
+          setOpenModal={setOpenModal}
+          handleCreateReport={handleCreateReport}
+          newReportDraft={newReportDraft}
+          setNewReportDraft={setNewReportDraft}
+          students={students}
+        />
+      )}
 
-            <form onSubmit={handleCreateReport} className="mt-3.5 space-y-3.5">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Reporter Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Cikgu Nadia"
-                    value={newReportDraft.reporterName}
-                    onChange={(e) => setNewReportDraft({ ...newReportDraft, reporterName: e.target.value })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-purple focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Reporter Role</label>
-                  <select
-                    value={newReportDraft.reporterRole}
-                    onChange={(e) => setNewReportDraft({ ...newReportDraft, reporterRole: e.target.value as any })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-purple focus:outline-none"
-                  >
-                    <option value="Teacher">Teacher</option>
-                    <option value="Parent">Parent</option>
-                    <option value="Student">Student</option>
-                  </select>
-                </div>
-              </div>
+      {reportToDismiss && (
+        <DismissReportModal
+          reportToDismiss={reportToDismiss}
+          setReportToDismiss={setReportToDismiss}
+          confirmDismiss={confirmDismiss}
+        />
+      )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Concern Student</label>
-                  <select
-                    value={newReportDraft.studentId}
-                    onChange={(e) => setNewReportDraft({ ...newReportDraft, studentId: e.target.value })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-purple focus:outline-none"
-                  >
-                    {students.map(s => (
-                      <option key={s.id} value={s.id}>{s.avatar} {s.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Urgency</label>
-                  <select
-                    value={newReportDraft.urgency}
-                    onChange={(e) => setNewReportDraft({ ...newReportDraft, urgency: e.target.value as any })}
-                    className="w-full text-xs font-bold bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-purple focus:outline-none"
-                  >
-                    <option>Normal</option>
-                    <option>High</option>
-                    <option>Urgent</option>
-                  </select>
-                </div>
-              </div>
+      {incidentToReview && (
+        <ReviewIncidentModal
+          incidentToReview={incidentToReview}
+          setIncidentToReview={setIncidentToReview}
+          confirmReviewIncident={confirmReviewIncident}
+        />
+      )}
 
-              <div>
-                <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Report Narrative Description</label>
-                <textarea
-                  required
-                  value={newReportDraft.description}
-                  onChange={(e) => setNewReportDraft({ ...newReportDraft, description: e.target.value })}
-                  placeholder="State specific behaviors observed, indicators of distress, withdraw trends, outbursts..."
-                  rows={3}
-                  className="w-full text-xs bg-card border border-border rounded-xl p-2.5 focus:ring-2 focus:ring-duo-purple focus:outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => setOpenModal(null)}
-                  className="px-4 py-2 text-xs font-bold bg-muted border border-border rounded-xl hover:bg-muted/80 text-muted-foreground transition"
-                >
-                  Cancel
-                </button>
-                <DuoButton type="submit" variant="purple" size="sm">
-                  Log Report
-                </DuoButton>
-              </div>
-            </form>
-          </div>
-        </div>
+      {reportToView && (
+        <ViewReportModal
+          reportToView={reportToView}
+          setReportToView={setReportToView}
+        />
       )}
 
       {/* Navigation bottom bar for Mobile view */}
@@ -1972,18 +2114,47 @@ function CounsellorPortal() {
           let hasBadge = false;
           let badgeValue = "";
 
-          if (item.id === "reports" && newReportsCount > 0) {
-            hasBadge = true;
-            badgeValue = `${newReportsCount}`;
-          } else if (item.id === "discipline" && disciplineIncidents.filter(i => i.disciplineStatus === "Pending Review").length > 0) {
-            hasBadge = true;
-            badgeValue = "!";
+          if (item.id === "risk") {
+            const count = highRiskStudentsCount;
+            if (count > 0) {
+              hasBadge = true;
+              badgeValue = `${count}`;
+            }
+          } else if (item.id === "pending_actions") {
+            const count = dynamicOverdueTasksCount;
+            if (count > 0) {
+              hasBadge = true;
+              badgeValue = `${count}`;
+            }
+          } else if (item.id === "reports") {
+            const count = newReportsCount;
+            if (count > 0) {
+              hasBadge = true;
+              badgeValue = `${count}`;
+            }
+          } else if (item.id === "discipline") {
+            const count = newIncidentsCount;
+            if (count > 0) {
+              hasBadge = true;
+              badgeValue = `${count}`;
+            }
+          } else if (item.id === "appointments") {
+            const pendingCount = appointments.filter(a => a.status === "Pending").length;
+            const notifCount = notifications.length;
+            const totalBadge = pendingCount + notifCount;
+            if (totalBadge > 0) {
+              hasBadge = true;
+              badgeValue = `${totalBadge}`;
+            }
           }
 
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setMobileShowCaseDetail(false);
+              }}
               className={`relative flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-xl text-[10px] font-bold flex-1 min-w-[64px] shrink-0 transition ${
                 isActive ? "text-duo-pink bg-pink-50/40" : "text-muted-foreground hover:bg-muted/30"
               }`}
