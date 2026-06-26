@@ -108,6 +108,8 @@ function ParentDashboard() {
   const [loved, setLoved] = useState(false);
   const [messages, setMessages] = useState<ParentMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [wellbeingUrgency, setWellbeingUrgency] = useState("Normal");
+  const [wellbeingDesc, setWellbeingDesc] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("parent_state");
@@ -147,6 +149,40 @@ function ParentDashboard() {
         },
       ]);
     }, 900);
+  };
+
+  const handleSendWellbeingConcern = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wellbeingDesc.trim()) return;
+
+    const saved = localStorage.getItem("counsellor_state");
+    let cState: any = {};
+    if (saved) {
+      try {
+        cState = JSON.parse(saved);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    const currentReports = cState.reports || [];
+    
+    const newReport = {
+      id: `rep-${Math.floor(200 + Math.random() * 800)}`,
+      reporterName: "Farah",
+      reporterRole: "Parent",
+      studentId: activeChild,
+      studentName: child.name,
+      date: new Date().toISOString().split("T")[0],
+      description: wellbeingDesc,
+      urgency: wellbeingUrgency,
+      status: "New",
+    };
+
+    cState.reports = [newReport, ...currentReports];
+    localStorage.setItem("counsellor_state", JSON.stringify(cState));
+    alert(`Wellbeing concern submitted to counselor for ${child.name}.`);
+    setWellbeingDesc("");
+    setWellbeingUrgency("Normal");
   };
 
   return (
@@ -411,52 +447,105 @@ function ParentDashboard() {
               </div>
             </DuoCard>
 
-            <DuoCard accent="purple">
-              <h3 className="mb-2 font-display text-lg font-bold text-duo-purple">
-                Message Teacher
-              </h3>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Start a conversation with {child.name.split(" ")[0]}'s teacher.
-              </p>
-              <div className="max-h-48 space-y-2 overflow-y-auto rounded-xl bg-muted/50 p-3">
-                {messages.length === 0 ? (
-                  <p className="text-center text-xs text-muted-foreground">
-                    No messages yet — say hi! 👋
-                  </p>
-                ) : (
-                  messages.map((m) => (
-                    <div
-                      key={m.id}
-                      className={`flex ${m.from === "You" ? "justify-end" : "justify-start"}`}
-                    >
+            <div className="space-y-5">
+              <DuoCard accent="purple">
+                <h3 className="mb-2 font-display text-lg font-bold text-duo-purple">
+                  Message Teacher
+                </h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Start a conversation with {child.name.split(" ")[0]}'s teacher.
+                </p>
+                <div className="max-h-48 space-y-2 overflow-y-auto rounded-xl bg-muted/50 p-3">
+                  {messages.length === 0 ? (
+                    <p className="text-center text-xs text-muted-foreground">
+                      No messages yet — say hi! 👋
+                    </p>
+                  ) : (
+                    messages.map((m) => (
                       <div
-                        className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.from === "You" ? "bg-duo-purple text-white" : "bg-card border-2 border-border"}`}
+                        key={m.id}
+                        className={`flex ${m.from === "You" ? "justify-end" : "justify-start"}`}
                       >
-                        <div className="text-[10px] font-bold opacity-70">{m.from}</div>
-                        {m.text}
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.from === "You" ? "bg-duo-purple text-white" : "bg-card border-2 border-border"}`}
+                        >
+                          <div className="text-[10px] font-bold opacity-70">{m.from}</div>
+                          {m.text}
+                        </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  sendMessage();
-                }}
-                className="mt-3 flex gap-2"
-              >
-                <input
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  placeholder="Type a message…"
-                  className="flex-1 rounded-xl border-2 border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-duo-purple"
-                />
-                <DuoButton variant="purple" size="md" type="submit">
-                  <Send className="size-4" />
-                </DuoButton>
-              </form>
-            </DuoCard>
+                    ))
+                  )}
+                </div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    sendMessage();
+                  }}
+                  className="mt-3 flex gap-2"
+                >
+                  <input
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    placeholder="Type a message…"
+                    className="flex-1 rounded-xl border-2 border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-duo-purple"
+                  />
+                  <DuoButton variant="purple" size="md" type="submit">
+                    <Send className="size-4" />
+                  </DuoButton>
+                </form>
+              </DuoCard>
+
+              <DuoCard accent="pink">
+                <h3 className="mb-2 font-display text-lg font-bold text-duo-pink">
+                  Submit Wellbeing Concern
+                </h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Submit a confidential wellbeing concern directly to the school counselor.
+                </p>
+                <form onSubmit={handleSendWellbeingConcern} className="space-y-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                      Child
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={child.name}
+                      className="w-full rounded-xl border-2 border-border bg-muted/40 px-3 py-2 text-xs font-bold text-muted-foreground cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                      Urgency
+                    </label>
+                    <select
+                      value={wellbeingUrgency}
+                      onChange={(e) => setWellbeingUrgency(e.target.value)}
+                      className="w-full rounded-xl border-2 border-border bg-card px-3 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-duo-pink"
+                    >
+                      <option value="Normal">Normal Urgency</option>
+                      <option value="High">High Urgency</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                      Description of concern
+                    </label>
+                    <textarea
+                      required
+                      value={wellbeingDesc}
+                      onChange={(e) => setWellbeingDesc(e.target.value)}
+                      placeholder="State specific behaviors observed, indicators of distress, withdrawal trends..."
+                      rows={3}
+                      className="w-full resize-none rounded-xl border-2 border-border bg-card p-2 text-xs focus:outline-none focus:ring-2 focus:ring-duo-pink"
+                    />
+                  </div>
+                  <DuoButton variant="pink" size="sm" type="submit" className="w-full">
+                    Submit Concern
+                  </DuoButton>
+                </form>
+              </DuoCard>
+            </div>
           </div>
 
           {/* Photos */}

@@ -23,6 +23,7 @@ import {
   Megaphone,
   Camera,
   Send,
+  AlertTriangle,
 } from "lucide-react";
 
 export const Route = createFileRoute("/teacher")({
@@ -105,6 +106,10 @@ function TeacherDashboard() {
   const [chatOpen, setChatOpen] = useState<string | null>(null);
   const [chats, setChats] = useState<Record<string, ChatMessage[]>>({});
   const [chatDraft, setChatDraft] = useState("");
+  const [reportConcernOpen, setReportConcernOpen] = useState(false);
+  const [concernStudentId, setConcernStudentId] = useState(STUDENTS_IN_CLASS[0].id);
+  const [concernUrgency, setConcernUrgency] = useState("Normal");
+  const [concernDesc, setConcernDesc] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("teacher_state");
@@ -159,6 +164,44 @@ function TeacherDashboard() {
         [chatOpen]: [...(c[chatOpen] ?? []), { id: crypto.randomUUID(), from: "Parent", text: "Got it, thank you! 🙏" }],
       }));
     }, 800);
+  };
+
+  const handleSendTeacherConcern = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!concernDesc.trim()) return;
+
+    const studentObj = STUDENTS_IN_CLASS.find((s) => s.id === concernStudentId);
+    if (!studentObj) return;
+
+    const saved = localStorage.getItem("counsellor_state");
+    let cState: any = {};
+    if (saved) {
+      try {
+        cState = JSON.parse(saved);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    const currentReports = cState.reports || [];
+
+    const newReport = {
+      id: `rep-${Math.floor(200 + Math.random() * 800)}`,
+      reporterName: "Cikgu Nadia",
+      reporterRole: "Teacher",
+      studentId: concernStudentId,
+      studentName: studentObj.name,
+      date: new Date().toISOString().split("T")[0],
+      description: concernDesc,
+      urgency: concernUrgency,
+      status: "New",
+    };
+
+    cState.reports = [newReport, ...currentReports];
+    localStorage.setItem("counsellor_state", JSON.stringify(cState));
+    alert(`Wellbeing concern for ${studentObj.name} submitted to counselor.`);
+    setConcernDesc("");
+    setConcernUrgency("Normal");
+    setReportConcernOpen(false);
   };
 
   return (
@@ -419,34 +462,49 @@ function TeacherDashboard() {
                     label: "Mark Attendance",
                     sub: "Take attendance for your classes",
                     c: "green",
+                    onClick: () => alert("Attendance is marked in the list below!"),
                   },
                   {
                     icon: BookOpen,
                     label: "Post Materials",
                     sub: "Share files, links and resources",
                     c: "blue",
+                    onClick: () => alert("Materials composer coming soon!"),
                   },
                   {
                     icon: Camera,
                     label: "Upload Photos / Videos",
                     sub: "Share classroom moments",
                     c: "purple",
+                    onClick: () => alert("Upload composer coming soon!"),
                   },
                   {
                     icon: Megaphone,
                     label: "Send Announcement",
                     sub: "Send updates to classes",
                     c: "orange",
+                    onClick: () => setAnnouncementOpen(true),
+                  },
+                  {
+                    icon: AlertTriangle,
+                    label: "Report Student Concern",
+                    sub: "Submit wellbeing concern to Counselor",
+                    c: "red",
+                    onClick: () => setReportConcernOpen(true),
                   },
                   {
                     icon: MessageCircle,
                     label: "Chat with Parents",
                     sub: "Message parents directly",
                     c: "green",
+                    onClick: () => alert("Select a parent chat from the list below!"),
                   },
                 ].map((q) => (
                   <li key={q.label}>
-                    <button className="flex w-full items-center gap-3 rounded-xl border-2 border-border bg-card p-2.5 text-left transition hover:-translate-y-0.5">
+                    <button
+                      onClick={q.onClick}
+                      className="flex w-full items-center gap-3 rounded-xl border-2 border-border bg-card p-2.5 text-left transition hover:-translate-y-0.5"
+                    >
                       <span
                         className="grid size-9 place-items-center rounded-lg"
                         style={{ background: `var(--duo-${q.c})`, color: "white" }}
@@ -630,6 +688,93 @@ function TeacherDashboard() {
           </div>
         </main>
       </div>
+
+      {/* Report Student Concern Modal */}
+      {reportConcernOpen && (
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-black/40 backdrop-blur-xs">
+          <div className="bg-card w-full max-w-md rounded-2xl border-2 border-border p-5 shadow-2xl animate-pop-in my-auto">
+            <div className="flex justify-between items-center pb-3 border-b border-border">
+              <h2 className="font-display text-lg font-bold flex items-center gap-1.5 text-duo-red">
+                <AlertTriangle className="size-5" /> Report Student Concern
+              </h2>
+              <button onClick={() => setReportConcernOpen(false)} className="text-muted-foreground hover:text-foreground text-sm font-bold">✕</button>
+            </div>
+            
+            <form onSubmit={handleSendTeacherConcern} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                  Reporter
+                </label>
+                <input
+                  type="text"
+                  disabled
+                  value="Cikgu Nadia (Teacher)"
+                  className="w-full rounded-xl border-2 border-border bg-muted/40 px-3 py-2 text-xs font-bold text-muted-foreground cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                  Concern Student
+                </label>
+                <select
+                  value={concernStudentId}
+                  onChange={(e) => setConcernStudentId(e.target.value)}
+                  className="w-full rounded-xl border-2 border-border bg-card px-3 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-duo-red"
+                >
+                  {STUDENTS_IN_CLASS.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.avatar} {s.name} ({s.grade})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                  Urgency
+                </label>
+                <select
+                  value={concernUrgency}
+                  onChange={(e) => setConcernUrgency(e.target.value)}
+                  className="w-full rounded-xl border-2 border-border bg-card px-3 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-duo-red"
+                >
+                  <option value="Normal">Normal Urgency</option>
+                  <option value="High">High Urgency</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                  Report Narrative Description
+                </label>
+                <textarea
+                  required
+                  value={concernDesc}
+                  onChange={(e) => setConcernDesc(e.target.value)}
+                  placeholder="State specific behaviors observed, indicators of distress, withdrawal trends, outbursts..."
+                  rows={4}
+                  className="w-full resize-none rounded-xl border-2 border-border bg-card p-2 text-xs focus:outline-none focus:ring-2 focus:ring-duo-red"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-border">
+                <DuoButton
+                  type="button"
+                  variant="white"
+                  size="sm"
+                  onClick={() => setReportConcernOpen(false)}
+                >
+                  Cancel
+                </DuoButton>
+                <DuoButton type="submit" variant="red" size="sm">
+                  Log Report
+                </DuoButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 grid grid-cols-5 border-t-2 border-border bg-card md:hidden">
         {MOBILE_NAV.map((n) => (
